@@ -1,0 +1,75 @@
+set(ATen_CL_INCLUDE {ATen_CL_INCLUDE}
+  "${CMAKE_CURRENT_BINARY_DIR}"
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  PARENT_SCOPE)
+
+CONFIGURE_FILE(THClGeneral.h.in "${CMAKE_CURRENT_BINARY_DIR}/THCLGeneral.h")
+
+
+set(ATen_CL_SRCS ${ATen_CL_SRCS}
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClApply.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClBlas.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClDeviceUtils.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClGather.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClGeneral.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClKernels.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClReduceAll.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClReduceApplyUtils.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClReduce.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClScatter.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClStorageCopy.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClStorage.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorCopy.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensor.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorIndex.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorMasked.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorMath2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorMathBlas.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorMathCompare.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorMathCompareT.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorMath.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorMathPairwise.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorMathPointwise.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorMathScan.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorMathTransformReduce.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTypeParseTraits.cpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClApply.cl
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClDeviceUtils.cl
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClGather.cl
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClReduceAll.cl
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClReduceApplyUtils.cl
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClReduce.cl
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClScatter.cl
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClStorageGet.cl
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClStorageSet.cl
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorIndex.cl
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorInfoCl.cl
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorMasked.cl
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorMath2.cl
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorMathScan.cl
+  ${CMAKE_CURRENT_SOURCE_DIR}/THClTensorMathTransformReduce.cl
+
+  PARENT_SCOPE)
+
+INSTALL(FILES
+  THClApply.h
+  THClBlas.h
+  THClDeviceUtils.h
+  ${CMAKE_CURRENT_BINARY_DIR}/THCGeneral.h
+  THCl.h
+  THClKernels.h
+  THClOperators.h
+  THClReduceAll.h
+  THClReduceApplyUtils.h
+  THClReduce.h
+  THClStorageCopy.h
+  THClStorage.h
+  THClTensorCopy.h
+  THClTensor.h
+  THClTensorMathCompare.h
+  THClTensorMath.h
+  THClTensorMathPointwise.h
+  THClTypeParseTraits.h
+
+  DESTINATION "${ATEN_INSTALL_INCLUDE_SUBDIR}/THCL")

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.7)
 set(CMAKE_MODULE_PATH
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindCUDA
@@ -31,7 +31,6 @@ IF(NOT MSVC)
 ENDIF(NOT MSVC)
 
 INCLUDE(CheckCXXSourceCompiles)
-
 #Check if certain std functions are supported. Sometimes
 #_GLIBCXX_USE_C99 macro is not defined and some functions are missing.
 CHECK_CXX_SOURCE_COMPILES("
@@ -393,6 +392,8 @@ set(ATen_CPU_SRCS)
 set(ATen_CPU_INCLUDE)
 set(ATen_CUDA_SRCS)
 set(ATen_CUDA_INCLUDE)
+set(ATen_CL_SRCS)
+set(ATen_CL_INCLUDE)
 SET(ATEN_INSTALL_BIN_SUBDIR "bin" CACHE PATH "ATen install binary subdirectory")
 SET(ATEN_INSTALL_LIB_SUBDIR "lib" CACHE PATH "ATen install library subdirectory")
 SET(ATEN_INSTALL_INCLUDE_SUBDIR "include" CACHE PATH "ATen install include subdirectory")
@@ -404,8 +405,10 @@ include_directories(
   # dense
   ${CMAKE_CURRENT_SOURCE_DIR}/src/TH
   ${CMAKE_CURRENT_SOURCE_DIR}/src/THC
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/THCL
   ${CMAKE_CURRENT_BINARY_DIR}/src/TH
   ${CMAKE_CURRENT_BINARY_DIR}/src/THC
+  ${CMAKE_CURRENT_BINARY_DIR}/src/THCL
   # sparse
   ${CMAKE_CURRENT_SOURCE_DIR}/src/THS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/THCS
@@ -418,7 +421,7 @@ add_subdirectory(src/THNN)
 add_subdirectory(src/THS)
 
 if(NO_CUDA)
-  message("disabling CUDA because NO_CUDA is set")
+  message("Disabling CUDA because NO_CUDA is set")
   SET(CUDA_FLAG -n)
   SET(AT_CUDA_ENABLED 0)
 else()
@@ -428,6 +431,18 @@ else()
   add_subdirectory(src/THC)
   add_subdirectory(src/THCUNN)
   add_subdirectory(src/THCS)
+endif()
+
+# OpenCL
+find_package(OpenCL)
+
+if(NO_CL)
+  message("Disabling OpenCL because NO_CL is set.")
+  SET(AT_CL_ENABLED 0)
+else()
+  SET(AT_CL_ENABLED 1)
+  INCLUDE_DIRECTORIES(${OpenCL_INCLUDE_DIRS})
+  add_subdirectory(src/THCL)
 endif()
 
 find_package(CuDNN)
@@ -471,6 +486,9 @@ ${CMAKE_CURRENT_SOURCE_DIR}/src
 ${CMAKE_CURRENT_BINARY_DIR}/src/ATen)
 if(NOT NO_CUDA)
   include_directories(${CUDA_INCLUDE_DIRS})
+endif()
+if (NOT NO_CL)
+  include_directories(${OpenCL_INCLUDE_DIRS})
 endif()
 add_subdirectory(src/ATen/test)
 
