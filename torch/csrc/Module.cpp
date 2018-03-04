@@ -415,15 +415,18 @@ static PyObject* initModule() {
 #define ASSERT_TRUE(cmd) if (!(cmd)) return NULL
 
   THPUtils_addPyMethodDefs(methods, TorchMethods);
+  // DataLoaderMethods defined in DataLoader.cpp
   THPUtils_addPyMethodDefs(methods, DataLoaderMethods);
   THPUtils_addPyMethodDefs(methods, torch::autograd::python_functions());
 #ifdef WITH_CUDA
+  // THCPModule_methods, defined in cuda/Module.cpp
   THPUtils_addPyMethodDefs(methods, THCPModule_methods());
 #endif
 #ifdef WITH_CUDNN
   THPUtils_addPyMethodDefs(methods, THCUDNN_methods());
 #endif
 #ifdef WITH_DISTRIBUTED
+  // THDPModule_methods defined in distributed/Module.cpp
   THPUtils_addPyMethodDefs(methods, THDPModule_methods());
 #endif
 
