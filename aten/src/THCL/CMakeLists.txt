@@ -3,7 +3,7 @@ set(ATen_CL_INCLUDE {ATen_CL_INCLUDE}
   "${CMAKE_CURRENT_SOURCE_DIR}"
   PARENT_SCOPE)
 
-CONFIGURE_FILE(THClGeneral.h.in "${CMAKE_CURRENT_BINARY_DIR}/THCLGeneral.h")
+CONFIGURE_FILE(THClGeneral.h.in "${CMAKE_CURRENT_BINARY_DIR}/THClGeneral.h")
 
 
 set(ATen_CL_SRCS ${ATen_CL_SRCS}
@@ -56,7 +56,7 @@ INSTALL(FILES
   THClApply.h
   THClBlas.h
   THClDeviceUtils.h
-  ${CMAKE_CURRENT_BINARY_DIR}/THCGeneral.h
+  ${CMAKE_CURRENT_BINARY_DIR}/THClGeneral.h
   THCl.h
   THClKernels.h
   THClOperators.h
