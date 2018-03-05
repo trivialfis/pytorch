@@ -40,6 +40,8 @@ void initializeDtypes() {
   if (!torch_module) python_error();
   auto cuda_module = THPObjectPtr(PyImport_ImportModule("torch.cuda"));
   if (!cuda_module) python_error();
+  auto cl_module = THPObjectPtr(PyImport_ImportModule("torch.cl"));
+  if (!cl_module) python_error();
   auto sparse_module = THPObjectPtr(PyImport_ImportModule("torch.sparse"));
   if (!sparse_module) python_error();
   auto cuda_sparse_module = THPObjectPtr(PyImport_ImportModule("torch.cuda.sparse"));
@@ -52,29 +54,39 @@ void initializeDtypes() {
     std::string primary_name, legacy_name;
     std::tie(primary_name, legacy_name) = getDtypeNames(scalarType);
     PyObject *module = nullptr;
-    bool is_cuda, is_sparse;
+    bool is_cuda, is_sparse, is_cl;
     switch (backend) {
       case at::kCPU: {
         module = torch_module.get();
         is_cuda = false;
+	is_cl = false;
         is_sparse = false;
         break;
       }
       case at::kCUDA: {
         module = cuda_module.get();
         is_cuda = true;
+	is_cl = false;
         is_sparse = false;
         break;
+      }
+      case at::kCL: {
+        module = cl_module.get();
+        is_cuda = false;
+	is_cl = true;
+        is_sparse = false;
       }
       case at::kSparseCPU: {
         module = sparse_module.get();
         is_cuda = false;
+	is_cl = false;
         is_sparse = true;
         break;
       }
       case at::kSparseCUDA: {
         module = cuda_sparse_module.get();
         is_cuda = true;
+	is_cl = false;
         is_sparse = true;
         break;
       }

@@ -41,6 +41,7 @@ enum class Backend {
 
 constexpr Backend kCPU = Backend::CPU;
 constexpr Backend kCUDA = Backend::CUDA;
+constexpr Backend kCL = Backend::CL;
 constexpr Backend kSparseCPU = Backend::SparseCPU;
 constexpr Backend kSparseCUDA = Backend::SparseCUDA;
 

@@ -15,6 +15,7 @@ static const char* backend_to_string(const at::Type& type) {
   switch (type.backend()) {
     case at::kCPU: return "torch";
     case at::kCUDA: return "torch.cuda";
+    case at::kCL: return "torch.cl";
     case at::kSparseCPU: return "torch.sparse";
     case at::kSparseCUDA: return "torch.cuda.sparse";
     default: throw std::runtime_error("Unimplemented backend");
