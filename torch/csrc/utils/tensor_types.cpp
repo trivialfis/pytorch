@@ -11,20 +11,28 @@ using namespace at;
 
 namespace torch { namespace utils {
 
-static const char* backend_to_string(const at::Type& type) {
-  switch (type.backend()) {
-    case at::kCPU: return "torch";
-    case at::kCUDA: return "torch.cuda";
-    case at::kCL: return "torch.cl";
-    case at::kSparseCPU: return "torch.sparse";
-    case at::kSparseCUDA: return "torch.cuda.sparse";
-    default: throw std::runtime_error("Unimplemented backend");
-  }
+const char* backend_to_string(const at::Backend backend)
+{
+  switch (backend)
+    {
+    case kCPU: return "torch";
+    case kCUDA: return "torch.cuda";
+    case kCL: return "torch.cl";
+    case kSparseCPU: return "torch.sparse";
+    case kSparseCUDA: return "torch.cuda.sparse";
+    default:
+      {
+	std::string error =
+	  std::string("to_pystr: Unimplemented backend: ") +
+	  toStringAll(backend);
+	throw std::runtime_error(error);
+      }
+    }
 }
 
 std::string type_to_string(const at::Type& type) {
   std::ostringstream ss;
-  ss << backend_to_string(type) << "." << toString(type.scalarType()) << "Tensor";
+  ss << backend_to_string(type.backend()) << "." << toString(type.scalarType()) << "Tensor";
   return ss.str();
 }
 

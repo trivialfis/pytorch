@@ -55,45 +55,58 @@ void initializeDtypes() {
     std::tie(primary_name, legacy_name) = getDtypeNames(scalarType);
     PyObject *module = nullptr;
     bool is_cuda, is_sparse, is_cl;
-    switch (backend) {
-      case at::kCPU: {
-        module = torch_module.get();
-        is_cuda = false;
-	is_cl = false;
-        is_sparse = false;
-        break;
+    switch (backend)
+      {
+      case at::kCPU:
+	{
+	  module = torch_module.get();
+	  is_cuda = false;
+	  is_cl = false;
+	  is_sparse = false;
+	  break;
+	}
+      case at::kCUDA:
+	{
+	  module = cuda_module.get();
+	  is_cuda = true;
+	  is_cl = false;
+	  is_sparse = false;
+	  break;
+	}
+      case at::kCL:
+	{
+	  module = cl_module.get();
+	  is_cuda = false;
+	  is_cl = true;
+	  is_sparse = false;
+	}
+      case at::kSparseCPU:
+	{
+	  module = sparse_module.get();
+	  is_cuda = false;
+	  is_cl = false;
+	  is_sparse = true;
+	  break;
+	}
+      case at::kSparseCUDA:
+	{
+	  module = cuda_sparse_module.get();
+	  is_cuda = true;
+	  is_cl = false;
+	  is_sparse = true;
+	  break;
+	}
+      default:
+	{
+	  std::string error =
+	    std::string("initializeDtypes: Unimplemented backend: ") +
+	    toStringAll(backend);
+	  throw std::runtime_error(error); 
+	}
       }
-      case at::kCUDA: {
-        module = cuda_module.get();
-        is_cuda = true;
-	is_cl = false;
-        is_sparse = false;
-        break;
-      }
-      case at::kCL: {
-        module = cl_module.get();
-        is_cuda = false;
-	is_cl = true;
-        is_sparse = false;
-      }
-      case at::kSparseCPU: {
-        module = sparse_module.get();
-        is_cuda = false;
-	is_cl = false;
-        is_sparse = true;
-        break;
-      }
-      case at::kSparseCUDA: {
-        module = cuda_sparse_module.get();
-        is_cuda = true;
-	is_cl = false;
-        is_sparse = true;
-        break;
-      }
-      default: throw std::runtime_error("Unimplemented backend");
-    }
     // use this rather than context.getType() because getType throws exceptions.
-    auto baseType = context.type_registry[static_cast<int>(backend)][static_cast<int>(scalarType)].get();
+    auto baseType = context.type_registry[static_cast<int>(backend)
+					  ][static_cast<int>(scalarType)].get();
     auto type = baseType ? torch::autograd::VariableType::getType(*baseType) : nullptr;
     std::string name = std::string(PyModule_GetName(module)) + '.' + primary_name;
     PyObject *dtype = THPDtype_New(type, name, is_cuda, is_sparse);

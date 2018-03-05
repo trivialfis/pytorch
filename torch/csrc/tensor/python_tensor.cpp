@@ -156,7 +156,8 @@ static const char* get_module(Backend backend) {
 
 static std::string get_name(Backend backend, ScalarType scalarType) {
   std::ostringstream ss;
-  ss << get_module(backend) << "." << at::toString(scalarType) << "Tensor";
+  ss << torch::utils::backend_to_string(backend)
+     << "." << at::toString(scalarType) << "Tensor";
   return ss.str();
 }
 

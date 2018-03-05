@@ -84,6 +84,7 @@ private:
   }
   void doInitCUDA();
   std::once_flag thc_init;
+  std::once_flag thcl_init;
   bool enabled_cudnn = true;
   bool deterministic_cudnn = false;
   bool benchmark_cudnn = false;

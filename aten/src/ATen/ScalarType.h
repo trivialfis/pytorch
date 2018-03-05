@@ -34,9 +34,10 @@ enum class Backend {
   CL,
   SparseCPU,
   SparseCUDA,
+  Backend_End,
+  // End mean the end of useful backends.
   Undefined,
   NumOptions,
-  Backend_End
 };
 
 constexpr Backend kCPU = Backend::CPU;
@@ -62,6 +63,20 @@ static inline Backend toDense(Backend b) {
     case Backend::SparseCPU: return Backend::CPU;
     case Backend::SparseCUDA: return Backend::CUDA;
     default: throw std::runtime_error("Unknown backend");
+  }
+}
+
+static inline const char * toStringAll(Backend b)
+{
+  switch(b) {
+  case Backend::CPU: return "CPU";
+  case Backend::CUDA: return "CUDA";
+  case Backend::CL: return "CL";
+  case Backend::SparseCPU: return "SparseCPU";
+  case Backend::SparseCUDA: return "SparseCUDA";
+  case Backend::Undefined: return "Undefined";
+  case Backend::NumOptions: return "NumOptions";
+  default: return "UNKNOWN_BACKEND";
   }
 }
 
