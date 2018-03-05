@@ -144,7 +144,7 @@ PyObject *THPVariable_pynew(PyTypeObject *type, PyObject *args, PyObject *kwds)
           "Variable _grad_fn has to be a Function object or None, but got %s",
           THPUtils_typename(grad_fn));
   Tensor tensor;
-  if (!data || data == Py_None) {
+  if (!data || data == Py_None) { // No data as input.
     // For legacy serialization code, create an empty tensor. This is also used
     // by nn.Parameter() with no arguments.
     auto var = torch::tensor::get_default_tensor_type().tensor();

@@ -50,7 +50,17 @@ at::Type& type_from_string(const std::string& str) {
 std::vector<std::pair<Backend, ScalarType>> all_declared_types() {
   std::vector<std::pair<Backend, ScalarType>> ret;
   // can't easily iterate over enum classes
-  std::vector<Backend> backends = { Backend::CPU, Backend::CUDA, Backend::SparseCPU, Backend::SparseCUDA };
+  std::vector<Backend> backends;
+  for (size_t backend = static_cast<size_t>(Backend::Backend_Begin);
+       backend != static_cast<size_t>(Backend::Backend_End);
+       ++backend)
+    {
+      Backend backend_enum = static_cast<Backend>(backend);
+      if (backend_enum != Backend::Undefined || backend_enum != Backend::NumOptions)
+	{
+	  backends.push_back(backend_enum);
+	}
+    }
   std::vector<ScalarType> scalar_types = { ScalarType::Byte, ScalarType::Char, ScalarType::Double, ScalarType::Float,
                                            ScalarType::Int, ScalarType::Long, ScalarType::Short, ScalarType::Half};
   for (auto& backend : backends) {
