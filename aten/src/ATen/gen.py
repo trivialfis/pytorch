@@ -10,7 +10,7 @@ import function_wrapper
 import copy_wrapper
 
 from code_template import CodeTemplate
-
+import os
 
 # This file is the top-level entry point for code generation in ATen.
 # It takes an arbitrary number of arguments specifying metadata files to
@@ -45,6 +45,7 @@ class FileManager(object):
         self.filenames.add(filename)
 
     def _write_if_changed(self, filename, contents):
+        print('filename _wic:', filename, '\tpwd:', os.getcwd())
         try:
             with open(filename, 'r') as f:
                 old_contents = f.read()
@@ -355,6 +356,7 @@ def generate_outputs():
     declarations += native_parse.run(native_files)
     declarations = preprocess_declarations.run(declarations)
     for fname, env in generators.items():
+        print('fname:', fname)
         file_manager.write(fname, GENERATOR_DERIVED.substitute(env))
 
     # note: this will fill in top_env['type/tensor_method_declarations/definitions']
@@ -385,6 +387,8 @@ def generate_outputs():
 
 
 declare_outputs()
+print('source-path', options.source_path)
+print('output_dependencies:', options.output_dependencies)
 if options.output_dependencies is not None:
     file_manager.write_outputs(options.output_dependencies)
 else:

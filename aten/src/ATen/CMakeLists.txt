@@ -102,11 +102,15 @@ FILE(GLOB native_cpp RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "native/*.cpp")
 FILE(GLOB native_cudnn_cpp RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "native/cudnn/*.cpp")
 FILE(GLOB native_cuda_cu RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "native/cuda/*.cu")
 
-FILE(GLOB_RECURSE cuda_h
-     RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
-     "cuda/*.cuh" "cuda/*.h" "cudnn/*.cuh" "cudnn/*.h")
+if (NOT NO_CUDA)
+  FILE(GLOB_RECURSE cuda_h
+    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+    "cuda/*.cuh" "cuda/*.h" "cudnn/*.cuh" "cudnn/*.h")
+endif ()
 
-FILE(GLOB cudnn_cpp RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "cudnn/*.cpp")
+if (NOT NO_CUDA)
+  FILE(GLOB cudnn_cpp RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "cudnn/*.cpp")
+endif ()
 
 FILE(GLOB all_python RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.py")
 
@@ -137,6 +141,7 @@ endif()
 file(READ ${CMAKE_CURRENT_BINARY_DIR}/generated_cpp.txt generated_cpp)
 
 FILE(GLOB_RECURSE all_templates "templates/*")
+message("all_templates:" ${all_templates})
 
 FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/ATen)
 
@@ -165,6 +170,10 @@ IF(NOT NO_CUDA)
     SET(all_cpp ${all_cpp} ${cudnn_cpp})
   ENDIF()
 endif()
+IF (NOT NO_CL)
+  INCLUDE_DIRECTORIES(${ATen_CL_INCLUDE})
+  SET(all_cpp ${all_cpp} ${ATen_CL_SRCS})
+ENDIF()
 
 filter_list(generated_h generated_cpp "\\.h$")
 
@@ -180,6 +189,7 @@ ELSE()
   ADD_LIBRARY(ATen ${AT_LINK_STYLE} ${all_cpp})
 ENDIF()
 ADD_DEPENDENCIES(ATen aten_files_are_generated)
+
 
 SET_TARGET_PROPERTIES(ATen PROPERTIES VERSION 1 SOVERSION 1)
 
@@ -252,7 +262,7 @@ if (NNPACK_FOUND)
   target_link_libraries(ATen ${NNPACK_LIBRARIES})
 endif(NNPACK_FOUND)
 
-IF(CUDA_FOUND)
+IF((NOT NO_CUDA) AND CUDA_FOUND)
   TARGET_LINK_LIBRARIES(ATen
     ${CUDA_LIBRARIES}
     ${CUDA_cusparse_LIBRARY}

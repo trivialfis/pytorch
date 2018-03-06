@@ -58,7 +58,6 @@ at::Type& type_from_string(const std::string& str) {
 
 std::vector<std::pair<Backend, ScalarType>> all_declared_types() {
   std::vector<std::pair<Backend, ScalarType>> ret;
-  // can't easily iterate over enum classes
   std::vector<Backend> backends;
   for (size_t backend = static_cast<size_t>(Backend::Backend_Begin);
        backend != static_cast<size_t>(Backend::Backend_End);
@@ -70,6 +69,7 @@ std::vector<std::pair<Backend, ScalarType>> all_declared_types() {
 	  backends.push_back(backend_enum);
 	}
     }
+  // can't easily iterate over enum classes
   std::vector<ScalarType> scalar_types = { ScalarType::Byte, ScalarType::Char, ScalarType::Double, ScalarType::Float,
                                            ScalarType::Int, ScalarType::Long, ScalarType::Short, ScalarType::Half};
   for (auto& backend : backends) {
