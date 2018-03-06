@@ -64,7 +64,7 @@ std::vector<std::pair<Backend, ScalarType>> all_declared_types() {
        ++backend)
     {
       Backend backend_enum = static_cast<Backend>(backend);
-      if (backend_enum != Backend::Undefined || backend_enum != Backend::NumOptions)
+      if (backend_enum != Backend::Undefined && backend_enum != Backend::NumOptions)
 	{
 	  backends.push_back(backend_enum);
 	}

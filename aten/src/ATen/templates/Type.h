@@ -44,12 +44,31 @@ constexpr std::array<int64_t, 1> kEmptyStrides { {1} };
 
 static inline void noop_deleter(void*) {}
 
-enum class TypeID {
-  ${type_ids}
-  Undefined,
-  NumOptions
-};
+// Just put all types in it, macros are here just to keeping me out
+// of typo with all these capital names.
+enum class TypeID
+  {
+#define DEFINE_CPU_ID(_1, n, _2)		\
+   CPU ## n,					\
+   SparseCPU ## n,
+#define DEFINE_CUDA_ID(_1, n, _2)		\
+   CUDA ## n,					\
+   SparseCUDA ## n,
+#define DEFINE_CL_ID(_1, n, _2)			\
+   CL ## n,
 
+   AT_SPARSE_SCALAR_TYPES(DEFINE_CPU_ID)
+   AT_SPARSE_SCALAR_TYPES(DEFINE_CUDA_ID)
+   AT_SPARSE_SCALAR_TYPES(DEFINE_CL_ID)
+   // Sparse type doesn't have Half.
+   CPUHalf,
+   CUDAHalf,
+   CLHalf,
+
+   DEFINE_ID,
+   Undefined,
+   NumOptions
+  };
 
 struct AT_API Type {
   explicit Type(Context * context)

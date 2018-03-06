@@ -13,6 +13,11 @@
 #include "THC/THC.h"
 #include "ATen/CUDAGenerator.h"
 #endif
+
+#if AT_CL_ENABLED()
+#include "THCL/THCL.h"
+#endif
+
 #include "ATen/CPUGenerator.h"
 
 #ifdef USE_SSE3
@@ -39,6 +44,13 @@ Context::Context()
   generator_registry[static_cast<int>(Backend::CPU)]
     .reset(new CPUGenerator(this));
   Type::registerAll(this);
+}
+void Context::doInitCL()
+{
+#if AT_CL_ENABLED()
+  thcl_state = THCLState_alloc();
+  THCL_init(thcl_state);
+#endif
 }
 void Context::doInitCUDA() {
 #if AT_CUDA_ENABLED()

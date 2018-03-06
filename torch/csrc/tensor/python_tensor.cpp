@@ -215,7 +215,7 @@ static THPObjectPtr get_variable_dict() {
 static std::vector<PyTensorType> tensor_types;
 
 static void initialize_aten_types(std::vector<PyTensorType>& tensor_types) {
-  // includes CUDA types even when PyTorch is not built with CUDA
+  // includes CUDA, CL types even when PyTorch is not built with them.
   auto declared_types = torch::utils::all_declared_types();
   tensor_types.resize(declared_types.size() + 1);
 
@@ -228,6 +228,7 @@ static void initialize_aten_types(std::vector<PyTensorType>& tensor_types) {
   }
 
   // The type object for torch.Tensor is at the end.
+  // Set the default type to CPU float, name it as Tensor
   default_tensor_type = &tensor_types.back();
   set_type(*default_tensor_type, kCPU, kFloat);
   set_name(*default_tensor_type, "torch.Tensor");

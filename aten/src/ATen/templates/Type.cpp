@@ -6,6 +6,7 @@
 #include "ATen/ExpandUtils.h"
 #include "ATen/NativeFunctions.h"
 #include "ATen/UndefinedType.h"
+#include "ATen/Config.h"
 
 #include <iostream>
 ${type_headers}

@@ -18,6 +18,16 @@ _(int64_t,Long,i) \
 _(int16_t,Short,i) \
 _(Half,Half,d)
 
+// Defined here soly for use in Type.h
+#define AT_SPARSE_SCALAR_TYPES(_) \
+_(uint8_t,Byte,i) \
+_(int8_t,Char,i) \
+_(double,Double,d) \
+_(float,Float,d) \
+_(int,Int,i) \
+_(int64_t,Long,i) \
+_(int16_t,Short,i)
+
 enum class ScalarType {
 #define DEFINE_ENUM(_1,n,_2) \
   n,
