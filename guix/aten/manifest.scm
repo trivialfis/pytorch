@@ -21,4 +21,5 @@
    "pkg-config"
    "grep"
    "procps"
-   "sed"))
+   "sed"
+   "aten"))

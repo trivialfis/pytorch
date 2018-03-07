@@ -47,7 +47,7 @@ enum class Backend {
   Backend_End,
   // End mean the end of useful backends.
   Undefined,
-  NumOptions,
+  NumOptions = Backend_End
 };
 
 constexpr Backend kCPU = Backend::CPU;

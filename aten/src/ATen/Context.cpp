@@ -36,8 +36,9 @@ static inline void argErrorHandler(int arg, const char * msg, void * data) {
 }
 
 Context::Context()
-: thc_state(nullptr) {
-
+  :thcl_state(nullptr),
+   thc_state(nullptr)
+{
   THSetDefaultErrorHandler(errorHandler,nullptr);
   THSetDefaultArgErrorHandler(argErrorHandler,nullptr);
 
