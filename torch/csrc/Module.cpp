@@ -409,6 +409,10 @@ PyMethodDef* THCUDNN_methods() {
 }
 #endif
 
+#ifdef WITH_CL
+PyMethodDef* THCLPModule_methods();
+#endif
+
 static PyObject* initModule() {
   HANDLE_TH_ERRORS
   THInferNumThreads();
@@ -425,6 +429,9 @@ static PyObject* initModule() {
 #endif
 #ifdef WITH_CUDNN
   THPUtils_addPyMethodDefs(methods, THCUDNN_methods());
+#endif
+#ifdef WITH_CL
+  THPUtils_addPyMethodDefs(methods, THCLPModules());
 #endif
 #ifdef WITH_DISTRIBUTED
   // THDPModule_methods defined in distributed/Module.cpp
