@@ -5,8 +5,8 @@ set(ATen_CL_INCLUDE {ATen_CL_INCLUDE}
 
 # CONFIGURE_FILE(THCLGeneral.h.in "${CMAKE_CURRENT_BINARY_DIR}/THCLGeneral.h")
 
-# set(ATen_CL_SRCS ${ATen_CL_SRCS}
-#   ${CMAKE_CURRENT_SOURCE_DIR}/THCLGeneral.c
+set(ATen_CL_SRCS ${ATen_CL_SRCS}
+  ${CMAKE_CURRENT_SOURCE_DIR}/THCLGeneral.cc
 #   ${CMAKE_CURRENT_SOURCE_DIR}/THHalf.c
 #   ${CMAKE_CURRENT_SOURCE_DIR}/THAllocator.c
 #   ${CMAKE_CURRENT_SOURCE_DIR}/THSize.c
@@ -22,17 +22,18 @@ set(ATen_CL_INCLUDE {ATen_CL_INCLUDE}
 #   ${CMAKE_CURRENT_SOURCE_DIR}/THAtomic.c
 #   ${CMAKE_CURRENT_SOURCE_DIR}/THVector.cpp
 #   ${extra_src}
-# PARENT_SCOPE)
+PARENT_SCOPE)
 
-# INSTALL(FILES
-#   TH.h
+INSTALL(FILES
+  THCL.h
+  THCLGeneral.h
+
 #   THAllocator.h
 #   THMath.h
 #   THBlas.h
 #   THDiskFile.h
 #   THFile.h
 #   THFilePrivate.h
-#   ${CMAKE_CURRENT_BINARY_DIR}/THCLGeneral.h
 #   THGenerateAllTypes.h
 #   THGenerateDoubleType.h
 #   THGenerateFloatType.h
@@ -57,7 +58,7 @@ set(ATen_CL_INCLUDE {ATen_CL_INCLUDE}
 #   THVector.h
 #   THAtomic.h
 #   THHalf.h
-#   DESTINATION "${ATEN_INSTALL_INCLUDE_SUBDIR}/THCL")
+  DESTINATION "${ATEN_INSTALL_INCLUDE_SUBDIR}/THCL")
 
 # INSTALL(FILES
 #   vector/AVX.h

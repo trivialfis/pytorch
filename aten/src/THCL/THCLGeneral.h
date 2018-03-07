@@ -28,5 +28,8 @@ typedef struct THCLState
  // EasyCL *getCl();  
 } THCLState;
 
+void THCL_init(THCLState *state);
+THCLState* THCLState_alloc(void);
+void THCL_initializeState(THCLState *state);
 
 #endif	// THCL_GENERAL_INC

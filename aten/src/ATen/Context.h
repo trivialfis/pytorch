@@ -52,7 +52,7 @@ public:
     std::call_once(thcl_init, [&]{
      doInitCL();
     });
-    return thcl_init;
+    return thcl_state;
   }
   THCState* lazyInitCUDA() {
     std::call_once(thc_init,[&] {
@@ -84,6 +84,7 @@ public:
     [static_cast<int>(Backend::NumOptions)]
     [static_cast<int>(ScalarType::NumOptions)];
   // TODO: Consider making this private
+  THCLState* thcl_state;
   THCState * thc_state;
 private:
   void initCUDAIfNeeded(Backend p) {

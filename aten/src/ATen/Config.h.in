@@ -11,3 +11,5 @@
 #if !AT_CUDA_ENABLED() && AT_CUDNN_ENABLED()
 #error "Cannot enable CuDNN without CUDA"
 #endif
+
+#define AT_CL_ENABLED() @AT_CL_ENABLED@
