@@ -1,8 +1,11 @@
 (define-module (pytorch)
   #:use-module (guix packages)
+  #:use-module (guix download)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix build-system python)
+  #:use-module (guix build-system cmake)
   #:use-module (gnu packages base)
+  #:use-module (gnu packages boost)
   #:use-module (gnu packages cmake)
   #:use-module (gnu packages maths)
   #:use-module (gnu packages ninja)
@@ -34,11 +37,11 @@
        '("develop" "build")))
     (native-inputs `(("cmake" ,cmake)
 		     ("ninja" ,ninja)
-		     ("openblas" ,openblas)
 		     ("python-pyyaml" ,python-pyyaml)
 		     ("which" ,which)))
     (inputs `(("python-numpy" ,python-numpy)
 	      ("opencl-headers" ,opencl-headers)
+	      ("openblas" ,openblas)
 	      ("clBLAS" ,clBLAS)))
     (home-page "http://pytorch.org/")
     (synopsis "Tensors and Dynamic neural networks in Python with strong GPU
@@ -52,5 +55,3 @@ PyTorch is a Python package that provides two high-level features:
 You can reuse your favorite Python packages such as NumPy, SciPy and Cython to
  extend PyTorch when needed.")
     (license license:non-copyleft)))
-
-pytorch
