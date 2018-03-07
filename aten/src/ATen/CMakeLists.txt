@@ -123,31 +123,8 @@ ELSE()
   SET(PYCMD "python")
 ENDIF()
 
-SET(GEN_COMMAND
-    ${PYCMD} ${CMAKE_CURRENT_SOURCE_DIR}/gen.py ${CUDA_FLAG}
-    -s ${CMAKE_CURRENT_SOURCE_DIR}
-    ${cwrap_files}
-)
-
-EXECUTE_PROCESS(
-    COMMAND ${GEN_COMMAND}
-      --output-dependencies ${CMAKE_CURRENT_BINARY_DIR}/generated_cpp.txt
-    RESULT_VARIABLE RETURN_VALUE
-)
-if (NOT RETURN_VALUE EQUAL 0)
-    message(STATUS ${generated_cpp})
-    message(FATAL_ERROR "Failed to get generated_cpp list")
-endif()
-file(READ ${CMAKE_CURRENT_BINARY_DIR}/generated_cpp.txt generated_cpp)
-
-FILE(GLOB_RECURSE all_templates "templates/*")
-message("all_templates:" ${all_templates})
 
 FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/ATen)
-
-ADD_CUSTOM_COMMAND(OUTPUT ${generated_cpp}
-COMMAND ${GEN_COMMAND}
-DEPENDS ${all_python} ${all_templates} ${cwrap_files})
 
 # Generated headers used from a cuda (.cu) file are
 # not tracked correctly in cmake . We make the libATen.so depend explicitly
@@ -155,6 +132,8 @@ DEPENDS ${all_python} ${all_templates} ${cwrap_files})
 ADD_CUSTOM_TARGET(aten_files_are_generated
   DEPENDS ${generated_cpp}
 )
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/generated")
+file(READ ${CMAKE_CURRENT_BINARY_DIR}/ATen/generated_cpp.txt generated_cpp)
 
 
 SET(all_cpp ${base_cpp} ${native_cpp} ${native_cudnn_cpp} ${generated_cpp} ${ATen_CPU_SRCS})
