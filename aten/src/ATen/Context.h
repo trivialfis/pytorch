@@ -12,7 +12,7 @@
 // Forwarde declare these CUDA types here to avoid including CUDA headers in
 // ATen headers, which would make ATen always require CUDA to build.
 struct THCState;
-struct THCLState;
+struct THClState;
 struct CUstream_st;
 typedef struct CUstream_st *cudaStream_t;
 struct cudaDeviceProp;
@@ -47,7 +47,7 @@ public:
   int64_t current_device() const;
   // defined in header so that getType has ability to inline
   // call_once check. getType is called fairly frequently
-  THCLState* lazyInitDevice()
+  THClState* lazyInitDevice()
   {
     std::call_once(thcl_init, [&]{
      doInitCL();
@@ -84,7 +84,7 @@ public:
     [static_cast<int>(Backend::NumOptions)]
     [static_cast<int>(ScalarType::NumOptions)];
   // TODO: Consider making this private
-  THCLState* thcl_state;
+  THClState* thcl_state;
   THCState * thc_state;
 private:
   void initCUDAIfNeeded(Backend p) {

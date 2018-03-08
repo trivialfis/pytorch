@@ -4,16 +4,24 @@
 #include <boost/compute/core.hpp>
 
 #ifdef __cplusplus
-# define THC_EXTERNC extern "C"
+# define THCL_EXTERNC extern "C"
 #else
-# define THC_EXTERNC extern
+# define THCL_EXTERNC extern
 #endif
 
 #define THCL_API THCL_EXTERNC
 
 namespace compute = boost::compute;
 
-typedef struct THCLState
+class THClDeviceAllocator
+{
+  compute::buffer malloc()
+  {
+    return compute::buffer();
+  }
+};
+
+typedef struct THClState
 {
   int initialized;
   int allocatedDevices;
@@ -24,12 +32,12 @@ typedef struct THCLState
                  // (good for debugging stuff, bad for perf)
   int detailedTimings;
   compute::device device;
+  THClDeviceAllocator* clDeviceAllocator;
 
- // EasyCL *getCl();  
-} THCLState;
+} THClState;
 
-void THCL_init(THCLState *state);
-THCLState* THCLState_alloc(void);
-void THCL_initializeState(THCLState *state);
+void THCl_init(THClState *state);
+THClState* THClState_alloc();
+void THCl_initializeState(THClState *state);
 
 #endif	// THCL_GENERAL_INC

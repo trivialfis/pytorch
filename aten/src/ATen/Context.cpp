@@ -15,7 +15,7 @@
 #endif
 
 #if AT_CL_ENABLED()
-#include "THCL/THCL.h"
+#include "THCL/THCl.h"
 #endif
 
 #include "ATen/CPUGenerator.h"
@@ -49,8 +49,8 @@ Context::Context()
 void Context::doInitCL()
 {
 #if AT_CL_ENABLED()
-  thcl_state = THCLState_alloc();
-  THCL_init(thcl_state);
+  thcl_state = THClState_alloc();
+  THCl_init(thcl_state);
 #endif
 }
 void Context::doInitCUDA() {
