@@ -5,7 +5,7 @@
 #undef THNN_
 #include <THS/THS.h>
 
-#include "ATen/Storage.h"
+#include "ATen/StorageBase.h"
 #include "ATen/Context.h"
 
 #include <memory>
@@ -42,41 +42,11 @@ AT_BACKEND_MAPPING(CL)
 AT_BACKEND_MAPPING(CUDA)
 AT_BACKEND_MAPPING(SparseCUDA)
 
-template <Backend B, ScalarType S>
-struct StorageDispatch;
-#define AT_CREATE_CPU_STORAGE_DISPATCH(_1, SCALAR, _2)		\
-  template <>							\
-  struct StorageDispatch<Backend::CPU, ScalarType::SCALAR>	\
-  {								\
-    using StorageType = TH ## SCALAR ## Storage;		\
-  };
-#define AT_CREATE_CUDA_STORAGE_DISPATCH(_1, SCALAR, _2)		\
-  template <>							\
-  struct StorageDispatch<Backend::CUDA, ScalarType::SCALAR>	\
-  {								\
-    using StorageType = THCuda ## SCALAR ## Storage;		\
-  };
-#define AT_CREATE_CL_STORAGE_DISPATCH(_1, SCALAR, _2)	        \
-  template <>							\
-  struct StorageDispatch<Backend::CL, ScalarType::SCALAR>	\
-  {								\
-    using StorageType = THCL ## SCALAR ## Storage;		\
-  };
 
-AT_FORALL_SCALAR_TYPES(AT_CREATE_CPU_STORAGE_DISPATCH)
-#if AT_CUDA_ENABLED()
-AT_FORALL_SCALAR_TYPES(AT_CREATE_CUDA_STORAGE_DISPATCH)
-#endif
-#if AT_CL_ENABLED()
-AT_FORALL_SCALAR_TYPES(AT_CREATE_CL_STORAGE_DISPATCH)
-#endif
-
-
-template <Backend B, ScalarType S>
-struct Storage final : public _Storage
+AT_TEMPLATE struct Storage final : public StorageBase
 {
 public:
-  explicit _Storage(Context* context);
+  explicit Storage(Context* context);
 
   Storage(Context* context,
 	   typename StorageDispatch<B, S>::StorageType *wrapped);
@@ -124,4 +94,83 @@ protected:
   Context* context;
 };
 
+AT_TEMPLATE Storage::Storage(Context* context)
+  :storage(ATTHStorage_new<B, S>(), context){}
+AT_TEMPLATE Storage::Storage(Context* context, AT_STORAGE_TYPE* storage)
+  :storage(storage), context(context) {}
+AT_TEMPLATE Storage::Storage(Context* context, std::size_t storage_size)
+  :storage(storage), context(context) {}
+
+template <Backend b>
+struct ATTHAllocator;
+
+template <>
+struct ATTHAllocator<Backend::CPU>
+{
+  static THAllocator storage_deleter = {nullptr,
+					nullptr,
+					call_deleter,};
+  static THAllocator wrapped_allocator = {wrapped_alloc,
+					  nullptr,
+					  wrapped_free,};
+  static void call_deleter(void * ctx, void * data) {
+    auto fnptr = (std::function<void(void*)>*) ctx;
+    (*fnptr)(data);
+    delete fnptr;
+  }
+  static void* wrapped_alloc(void * ctx, ptrdiff_t size) {
+    auto ac = static_cast<detail::AllocatorRetainable*>(ctx);
+    ac->retain();
+    return ac->allocate(size);
+  }
+  static void wrapped_free(void * ctx, void * data) {
+    auto ac = static_cast<detail::AllocatorRetainable*>(ctx);
+    ac->deallocate(data);
+    ac->release();
+  }
+};
+
+# if AT_CUDA_ENABLED()
+
+template <>
+struct ATTHAllocator<Backend::CUDA>
+{
+  static THCDeviceAllocator storage_deleter = {nullptr,
+					       nullptr,
+					       call_deleter,
+					       nullptr,
+					       nullptr,
+  };
+  static THCDeviceAllocator wrapped_allocator = {wrapped_alloc,
+						 nullptr,
+						 wrapped_free,
+						 nullptr,
+						 nullptr,
+  };
+  static cudaError_t call_deleter<Backend::CUDA>(void * ctx, void * data) {
+    auto fnptr = (std::function<void(void*)>*) ctx;
+    (*fnptr)(data);
+    delete fnptr;
+    return cudaSuccess;
+  }
+  static cudaError_t wrapped_alloc<Backend::CUDA>(void * ctx,
+						  void** result,
+						  size_t size,
+						  cudaStream_t stream)
+  {
+    auto ac = static_cast<detail::AllocatorRetainable*>(ctx);
+    ac->retain();
+    *result = ac->allocate(size);
+    return cudaSuccess;
+  }
+  static cudaError_t wrapped_free<Backend::CUDA>(void * ctx, void * data) {
+    auto ac = static_cast<detail::AllocatorRetainable*>(ctx);
+    ac->deallocate(data);
+    ac->release();
+    return cudaSuccess;
+  }  
 }
+
+#endif
+
+} // namespace at
