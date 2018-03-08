@@ -87,7 +87,6 @@ public:
       + std::string(scalar2string<S>) + "Type";
   }
 
-
 protected:
   friend struct ${Type};
   ATStorage *storage;
@@ -113,17 +112,20 @@ struct ATTHAllocator<Backend::CPU>
   static THAllocator wrapped_allocator = {wrapped_alloc,
 					  nullptr,
 					  wrapped_free,};
-  static void call_deleter(void * ctx, void * data) {
+  static void call_deleter(void * ctx, void * data)
+  {
     auto fnptr = (std::function<void(void*)>*) ctx;
     (*fnptr)(data);
     delete fnptr;
   }
-  static void* wrapped_alloc(void * ctx, ptrdiff_t size) {
+  static void* wrapped_alloc(void * ctx, ptrdiff_t size)
+  {
     auto ac = static_cast<detail::AllocatorRetainable*>(ctx);
     ac->retain();
     return ac->allocate(size);
   }
-  static void wrapped_free(void * ctx, void * data) {
+  static void wrapped_free(void * ctx, void * data)
+  {
     auto ac = static_cast<detail::AllocatorRetainable*>(ctx);
     ac->deallocate(data);
     ac->release();
@@ -139,15 +141,14 @@ struct ATTHAllocator<Backend::CUDA>
 					       nullptr,
 					       call_deleter,
 					       nullptr,
-					       nullptr,
-  };
+					       nullptr,};
   static THCDeviceAllocator wrapped_allocator = {wrapped_alloc,
 						 nullptr,
 						 wrapped_free,
 						 nullptr,
-						 nullptr,
-  };
-  static cudaError_t call_deleter<Backend::CUDA>(void * ctx, void * data) {
+						 nullptr,};
+  static cudaError_t call_deleter<Backend::CUDA>(void * ctx, void * data)
+  {
     auto fnptr = (std::function<void(void*)>*) ctx;
     (*fnptr)(data);
     delete fnptr;
@@ -163,7 +164,8 @@ struct ATTHAllocator<Backend::CUDA>
     *result = ac->allocate(size);
     return cudaSuccess;
   }
-  static cudaError_t wrapped_free<Backend::CUDA>(void * ctx, void * data) {
+  static cudaError_t wrapped_free<Backend::CUDA>(void * ctx, void * data)
+  {
     auto ac = static_cast<detail::AllocatorRetainable*>(ctx);
     ac->deallocate(data);
     ac->release();
@@ -172,5 +174,122 @@ struct ATTHAllocator<Backend::CUDA>
 }
 
 #endif
+
+Storage::Storage(Context* context, std::size_t size,
+		 std::unique_ptr<Allocator> allocator)
+  : storage(nullptr),
+    context(context)
+{
+  auto ctx = new detail::AllocatorRetainable(std::move(allocator));
+  storage = ATTHStorage_newWithAllocator(size,
+					 &ATTHAllocator<B>::wrapped_allocator,
+					 ctx);
+  ctx->release();
+  ATTHStorage_clearFlag(storage, TH_STORAGE_RESIZABLE);
+}
+
+Storage::Storage(Context* context,
+  void * data, std::size_t size, const std::function<void(void*)> & deleter)
+  : storage(ATTHStorage_newWithDataAndAllocator<B, S>
+	    (static_cast<uint8_t*>(data), size,
+	     &storage_deleter,
+	     new std::function<void(void*)>(deleter))),
+    context(context)
+{
+  ATTHStorage_clearFlag<B, S>( storage, TH_STORAGE_RESIZABLE);
+}
+
+Storage::~Storage() {
+  ATTHStorage_free<B, S>( storage);
+}
+
+std::size_t Storage::elementSize() const {
+  return sizeof(uint8_t);
+}
+
+std::size_t Storage::size() const {
+  return storage->size;
+}
+
+void* Storage::data() {
+  return storage->data;
+}
+
+const void* Storage::data() const {
+  return storage->data;
+}
+
+auto Storage::retain() -> Storage&
+  {
+   ATTHStorage_retain<B, S>( storage);
+   return *this;
+  }
+
+auto Storage::free() -> Storage&
+  {
+   ATTHStorage_free<B, S>( storage);
+   return *this;
+  }
+
+void* Storage::unsafeGetTH(bool retain) const
+{
+  if (retain) {
+    ATTHStorage_retain(storage);
+  }
+  return storage;
+}
+
+auto Storage::resize(int64_t new_size) -> Storage&
+  {
+   ATTHStorage_resize(storage, new_size);
+   return *this;
+  }
+
+auto Storage::fill(Scalar value) -> Storage&
+  {
+   ATTHStorage_fill<B, S>(storage, (value.toByte()));
+   return *this;
+  }
+
+auto Storage::set(std::size_t ind, Scalar value) -> Storage&
+  {
+   ATTHStorage_set<B, S>(storage, ind, (value.toByte()));
+   return *this;
+  }
+
+auto Storage::fast_set(std::size_t ind, Scalar value) -> Storage&
+  {
+   throw std::runtime_error("unsupported operation 'fast_set'");
+  }
+
+auto Storage::get(std::size_t ind) -> Scalar {
+  // static cast to fix  long -> int64_t issues
+  return static_cast<uint8_t>((ATTHStorage_get<B, S>( storage, ind)));
+}
+
+auto Storage::fast_get(std::size_t ind) -> Scalar {
+  if(B == Backend::CPU)
+    throw std::runtime_error("unsupported operation 'fast_get'");
+  return static_cast<uint8_t>((storage->data[ind]));
+}
+
+void Storage::set_flag(char flag) {
+  ATTHStorage_setFlag<B, S>( storage, flag);
+}
+
+void Storage::clear_flag(char flag) {
+  ATTHStorage_clearFlag<B, S>(storage, flag);
+}
+
+int Storage::getDevice() const {
+  if (B == Backend::CPU)
+    throw std::runtime_error("CPU storage has no device"); //storage->device;
+  else
+    return storage->device;
+}
+
+Type& Storage::type() const {
+  return context->getType(B, S);
+}
 
 } // namespace at
