@@ -12,7 +12,7 @@ namespace at {
 
 CPUByteStorage::CPUByteStorage(Context* context):
     // storage(THByteStorage_new()), context(context) {}
-  storage(_new_op<Backend::CPU, ScalarType::Byte>::_new()), context(context) {}
+  storage(ATTHStorage_new<Backend::CPU, ScalarType::Byte>()), context(context) {}
 
 CPUByteStorage::CPUByteStorage(Context* context, THByteStorage* storage):
     storage(storage), context(context) {}

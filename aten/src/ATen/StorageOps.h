@@ -1,7 +1,15 @@
+#ifndef STORAGE_OPS
+#define STORAGE_OPS
+
+#include "ATen/ScalarType.h"
+
 #include "ATen/StorageOpsGeneric.h"
+
 #ifndef TH_GENERIC_FILE
 #error "You must define TH_GENERIC_FILE before including THGenerateByteType.h"
 #endif
+
+
 
 #define real uint8_t
 #define ureal uint8_t
@@ -32,3 +40,5 @@
 #ifndef THGenerateManyTypes
 #undef TH_GENERIC_FILE
 #endif
+
+#endif	// STORAGE_OPS

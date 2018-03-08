@@ -73,31 +73,31 @@ AT_FORALL_SCALAR_TYPES(AT_CREATE_CL_STORAGE_DISPATCH)
 
 
 template <Backend B, ScalarType S>
-struct _Storage final : public Storage
+struct Storage final : public _Storage
 {
 public:
   explicit _Storage(Context* context);
 
-  _Storage(Context* context,
+  Storage(Context* context,
 	   typename StorageDispatch<B, S>::StorageType *wrapped);
-  _Storage(Context* context, std::size_t size);
-  _Storage(Context* context, std::size_t size, std::unique_ptr<Allocator> allocator);
-  _Storage(Context* context,
+  Storage(Context* context, std::size_t size);
+  Storage(Context* context, std::size_t size, std::unique_ptr<Allocator> allocator);
+  Storage(Context* context,
     void * data, std::size_t size, const std::function<void(void*)> & deleter);
-  virtual ~_Storage();
+  virtual ~Storage();
 
   virtual std::size_t elementSize() const override;
   virtual std::size_t size() const override;
   virtual void* data() override;
   virtual const void* data() const override;
-  virtual _Storage& retain() override;
-  virtual _Storage& free() override;
+  virtual Storage& retain() override;
+  virtual Storage& free() override;
   virtual void * unsafeGetTH(bool retain) const override;
 
-  virtual _Storage& resize(int64_t new_size) override;
-  virtual _Storage& fill(Scalar value) override;
-  virtual _Storage& set(std::size_t ind, Scalar value) override;
-  virtual _Storage& fast_set(std::size_t ind, Scalar value) override;
+  virtual Storage& resize(int64_t new_size) override;
+  virtual Storage& fill(Scalar value) override;
+  virtual Storage& set(std::size_t ind, Scalar value) override;
+  virtual Storage& fast_set(std::size_t ind, Scalar value) override;
   virtual Scalar get(std::size_t ind) override;
   virtual Scalar fast_get(std::size_t ind) override;
 
@@ -120,7 +120,8 @@ public:
 
 protected:
   friend struct ${Type};
-  ${THStorage} *storage;
+  ATStorage *storage;
   Context* context;
 };
+
 }
