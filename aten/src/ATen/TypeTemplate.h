@@ -88,13 +88,6 @@ DEFINE_TYPE_METHOD(bool, is_distributed,
 		     return false;
 		   })
 
-template <Backend B>
-struct dispatch_storage;
-template <>
-struct dispatch_storage<Backend::CPU>
-{
-  
-}
 
 template <Backend B, ScalarType S>
 struct _Type final : public Type, ID_op<B, S>, scalarType_op<B, S>

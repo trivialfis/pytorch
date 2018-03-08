@@ -1,6 +1,7 @@
 #include "ATen/CPUByteStorage.h"
 #include "ATen/Half.h"
 #include "ATen/Allocator.h"
+#include "ATen/StorageOps.h"
 
 #include "ATen/Config.h"
 #if AT_CUDA_ENABLED()
@@ -10,7 +11,8 @@
 namespace at {
 
 CPUByteStorage::CPUByteStorage(Context* context):
-    storage(THByteStorage_new()), context(context) {}
+    // storage(THByteStorage_new()), context(context) {}
+  storage(_new_op<Backend::CPU, ScalarType::Byte>::_new()), context(context) {}
 
 CPUByteStorage::CPUByteStorage(Context* context, THByteStorage* storage):
     storage(storage), context(context) {}

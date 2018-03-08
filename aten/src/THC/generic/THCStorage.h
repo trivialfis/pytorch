@@ -1,6 +1,8 @@
 #ifndef THC_GENERIC_FILE
 #define THC_GENERIC_FILE "generic/THCStorage.h"
 #else
+// Once defined, the following definition will be omitted, so they only
+// appears in place where surrounded by definitons for real..
 
 #define TH_STORAGE_REFCOUNTED 1
 #define TH_STORAGE_RESIZABLE  2
