@@ -11,8 +11,15 @@
 #define TH_CONVERT_ACCREAL_TO_REAL(_val) (real)(_val)
 #define THInf UCHAR_MAX
 #define TH_REAL_IS_BYTE
+// Backend in enum
+#define Back CPU		
+// Backend symbol used by TH libraries
+#define Back_sym
 #line 1 TH_GENERIC_FILE
 #include TH_GENERIC_FILE
+#undef Back_sym
+#undef Back
+
 #undef real
 #undef ureal
 #undef accreal
