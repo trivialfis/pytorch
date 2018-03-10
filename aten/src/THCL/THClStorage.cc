@@ -1,10 +1,7 @@
-#include <cstddef>
+#include "THClStorage.h"
+#include "THClGeneral.h"
+#include "THClGeneral.h"
 
-template <typename T>
-struct THClStorage
-{
-  T *data;
-  std::ptrdiff_t size;
-  int refcount;
-  char flag;
-};
+
+#include "generic/THClStorage.cc"
+#include "THClGenerateAllTypes.h"

@@ -10,29 +10,29 @@
 #endif
 
 #define THCL_API THCL_EXTERNC
+#include <boost/compute/command_queue.hpp>
+#include "TH/TH.h"
 
 namespace compute = boost::compute;
 
-class THClDeviceAllocator
+typedef struct THClDeviceAllocator
 {
-  compute::buffer malloc()
-  {
-    return compute::buffer();
-  }
-};
+  cl_int (*malloc)(void*, void**, size_t, cl_command_queue);
+  cl_int (*realloc)(void*, void**, size_t, size_t, cl_command_queue);
+  cl_int (*free)(void*, void*);
+} THClDeviceAllocator;
 
 typedef struct THClState
 {
   int initialized;
-  int allocatedDevices;
-  int currentDevice;
-  int trace; // default 0; set to 1 to see message for every gpu buffer alloc, delete,
-             // or device <-> host transfer
-  int addFinish; // default 0, should we add clFinish() after any kernel, enqueue, etc?
-                 // (good for debugging stuff, bad for perf)
-  int detailedTimings;
-  compute::device device;
-  THClDeviceAllocator* clDeviceAllocator;
+
+  compute::device* currentDevice;
+  compute::command_queue* currentQueue;
+  compute::context* currentContext;
+  size_t numDevices;
+
+  THAllocator*  clHostAllocator;
+  THAllocator* clDeviceAllocator;
 
 } THClState;
 

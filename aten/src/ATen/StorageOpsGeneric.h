@@ -1,6 +1,5 @@
 #ifndef TH_GENERIC_FILE
 #define TH_GENERIC_FILE "ATen/StorageOpsGeneric.h"
-
 #else
 
 #include <ATen/ScalarType.h>
