@@ -1,6 +1,7 @@
 #include "ATen/CPUByteStorage.h"
 #include "ATen/Half.h"
 #include "ATen/Allocator.h"
+
 #include "ATen/StorageOps.h"
 
 #include "ATen/Config.h"
@@ -12,7 +13,8 @@ namespace at {
 
 CPUByteStorage::CPUByteStorage(Context* context):
     // storage(THByteStorage_new()), context(context) {}
-  storage(ATTHStorage_new<Backend::CPU, ScalarType::Byte>()), context(context) {}
+  storage(ATTHStorage_new<Backend::CPU,
+	  ScalarType::Byte>::op()), context(context) {}
 
 CPUByteStorage::CPUByteStorage(Context* context, THByteStorage* storage):
     storage(storage), context(context) {}

@@ -8,6 +8,7 @@
 #include "ATen/UndefinedType.h"
 
 #include <iostream>
+#include "ATen/TypeTemplate.h"
 #include "ATen/CPUByteType.h"
 #include "ATen/CPUCharType.h"
 #include "ATen/CPUDoubleType.h"
@@ -44,14 +45,14 @@ void Type::registerAll(Context * context) {
   context->type_registry[static_cast<int>(Backend::SparseCPU)][static_cast<int>(ScalarType::Long)].reset(new SparseCPULongType(context));
   context->type_registry[static_cast<int>(Backend::SparseCPU)][static_cast<int>(ScalarType::Short)].reset(new SparseCPUShortType(context));
   context->type_registry[static_cast<int>(Backend::Undefined)][static_cast<int>(ScalarType::Undefined)].reset(new UndefinedType(context));
-  // context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Byte)].reset(new ClByteType(context));
-  // context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Char)].reset(new ClCharType(context));
-  // context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Double)].reset(new ClDoubleType(context));
-  // context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Float)].reset(new ClFloatType(context));
-  // context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Int)].reset(new ClIntType(context));
-  // context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Long)].reset(new ClLongType(context));
-  // context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Short)].reset(new ClShortType(context));
-  // context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Half)].reset(new ClHalfType(context));
+  context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Byte)].reset(new TypeImpl<Backend::CL, ScalarType::Byte>{context});
+  context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Char)].reset(new TypeImpl<Backend::CL, ScalarType::Char>{context});
+  context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Double)].reset(new TypeImpl<Backend::CL, ScalarType::Double>{context});
+  context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Float)].reset(new TypeImpl<Backend::CL, ScalarType::Float>{context});
+  context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Int)].reset(new TypeImpl<Backend::CL, ScalarType::Int>{context});
+context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Long)].reset(new TypeImpl<Backend::CL, ScalarType::Long>{context});
+context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Short)].reset(new TypeImpl<Backend::CL, ScalarType::Short>{context});
+ context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Half)].reset(new TypeImpl<Backend::CL, ScalarType::Half>{context});
 }
 
 Tensor & Type::copy_(Tensor & self, const Tensor & src, bool non_blocking) const {

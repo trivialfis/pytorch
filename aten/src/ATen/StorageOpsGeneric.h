@@ -1,112 +1,198 @@
 #ifndef TH_GENERIC_FILE
 #define TH_GENERIC_FILE "ATen/StorageOpsGeneric.h"
+
 #else
 
+#include <ATen/ScalarType.h>
+/*
+  Anything use of macro technique for code generation should stop at this layer.
+*/
 namespace at
 {
-
 // Generate storage types.
+#ifndef ATTHStorage_dispatch
+#define ATTHStorage_dispatch
 template <Backend B, ScalarType S>
 struct ATTHStorage;
+#endif
 
-#define CREATE_AT_STORAGES()					\
-  template <>							\
-  struct ATTHStorage<Backend::Back, ScalarType::Real>		\
-  {								\
-    using type = TH_CONCAT_4(TH, Back_sym, Real, Storage);	\
-  };
-
-CREATE_AT_STORAGES()
+template <>
+struct ATTHStorage<Backend::Back, ScalarType::Real>
+{
+  using type = TH_CONCAT_4(TH, Back_sym, Real, Storage);
+};
 
 #define TH_CONCAT_5_EXPAND(a, b, c, d, e)             a ## b ## c ## d ## e
 #define TH_CONCAT_5(a, b, c, d, e)        TH_CONCAT_5_EXPAND(a, b, c, d, e)
 
 #define ATStorage_(NAME)    TH_CONCAT_5(TH, Back_sym, Real, Storage_, NAME)
-
-// Things are geting tedious really fast.
-#define AT_TEMPLATE template <Backend B, ScalarType S>
 #define AT_STORAGE_TYPE typename ATTHStorage<B, S>::type
+#define AT_STORAGE_DISPATCH typename ATTHStorage<Backend::Back, ScalarType::Real>::type
 
-AT_TEMPLATE
-AT_STORAGE_TYPE* ATTHStorage_new()
-{
-  return ATStorage_(new)();
-}
+#define CASOE(name)					\
+  template <Backend B, ScalarType S>			\
+  struct name ;						\
 
-AT_TEMPLATE
-AT_STORAGE_TYPE* ATTHStorage_new_with_size(long size)
+#ifndef ATTHStorage_new_op
+#define ATTHStorage_new_op
+CASOE(ATTHStorage_new)
+#endif
+template <>
+struct ATTHStorage_new<Backend::Back, ScalarType::Real>
 {
-  return ATStorage_(newWithSize)(size);
-}
+  static AT_STORAGE_DISPATCH* op ()
+  {
+    return ATStorage_(new)();
+  }
+};
 
-AT_TEMPLATE
-AT_STORAGE_TYPE* ATTHStorage_new_with_allocator(std::size_t size,
-						 THAllocator* allocator,
-						 void *allocatorContext)
+#ifndef ATTHStorage_new_with_size_op
+#define ATTHStorage_new_with_size_op
+CASOE(ATTHStorage_new_with_size)
+#endif
+template <>
+struct ATTHStorage_new_with_size<Backend::Back, ScalarType::Real>
 {
-  return ATStorage_(newWithAllocator)(size, allocator, allocatorContext);
-}
+  static AT_STORAGE_DISPATCH* op (ptrdiff_t size)
+  {
+    return ATStorage_(newWithSize)(size);
+  };
+};
 
-AT_TEMPLATE
-AT_STORAGE_TYPE*
-ATTHStorage_new_with_data_and_allocator(real* data,
-					long size,
-					THAllocator* allocator,
-					void* allocatorContext)
+#ifndef ATTHStorage_new_with_allocator_op
+#define ATTHStorage_new_with_allocator_op
+CASOE(ATTHStorage_new_with_allocator)
+#endif
+template <>
+struct ATTHStorage_new_with_allocator<Backend::Back, ScalarType::Real>
 {
-  return ATStorage_(newWithDataAndAllocator)(data,
-					     size,
-					     allocator,
-					     allocatorContext);
-}
+  static AT_STORAGE_DISPATCH* op(ptrdiff_t size,
+				 THAllocator* allocator,
+				 void *allocatorContext)
+  {
+    return ATStorage_(newWithAllocator)(size, allocator, allocatorContext);
+  }
+};
 
-AT_TEMPLATE
-void ATTHStorage_free(AT_STORAGE_TYPE *storage)
+#ifndef ATTHStorage_new_with_data_and_allocator_op
+#define ATTHStorage_new_with_data_and_allocator_op
+CASOE(ATTHStorage_new_with_data_and_allocator)
+#endif
+template <>
+struct ATTHStorage_new_with_data_and_allocator<Backend::Back, ScalarType::Real>
 {
-  ATStorage_(free)(storage);
-}
+  static AT_STORAGE_DISPATCH* op(real* data, ptrdiff_t size, THAllocator* allocator,
+				 void* allocatorContext)
+  {
+    return ATStorage_(newWithDataAndAllocator)(data, size, allocator,
+					       allocatorContext);
+  }
+};
 
-AT_TEMPLATE
-void ATTHStorage_retain(AT_STORAGE_TYPE *storage)
+#ifndef ATTHStorage_free_op
+#define ATTHStorage_free_op
+CASOE(ATTHStorage_free)
+#endif
+template <>
+struct ATTHStorage_free<Backend::Back, ScalarType::Real>
 {
-  ATStorage_(retain)(storage);
-}
+  static void op(AT_STORAGE_DISPATCH *storage)
+  {
+    ATStorage_(free)(storage);
+  }
+};
 
-AT_TEMPLATE
-void ATTHStorage_resize(AT_STORAGE_TYPE *storage, int64_t new_size)
+#ifndef ATTHStorage_retain_op
+#define ATTHStorage_retain_op
+CASOE(ATTHStorage_retain)
+#endif
+template <>
+struct ATTHStorage_retain<Backend::Back, ScalarType::Real>
 {
-  ATStorage_(resize)(storage, new_size);
-}
+  static void op(AT_STORAGE_DISPATCH *storage)
+  {
+    ATStorage_(retain)(storage);
+  }
+};
 
-AT_TEMPLATE
-void ATTHStorage_fill(AT_STORAGE_TYPE *storage, int value)
+#ifndef ATTHStorage_resize_op
+#define ATTHStorage_resize_op
+CASOE(ATTHStorage_resize)
+#endif
+template<>
+struct ATTHStorage_resize<Backend::Back, ScalarType::Real>
 {
-  ATStorage_(fill)(storage, value);
-}
+  static void op(AT_STORAGE_DISPATCH *storage, ptrdiff_t new_size)
+  {
+    ATStorage_(resize)(storage, new_size);
+  }
+};
 
-AT_TEMPLATE
-void ATTHStorage_set(AT_STORAGE_TYPE *storage, size_t ind, int value)
+#ifndef ATTHStorage_fill_op
+#define ATTHStorage_fill_op
+CASOE(ATTHStorage_fill)
+#endif
+template<>
+struct ATTHStorage_fill<Backend::Back, ScalarType::Real>
 {
-  ATStorage_(set)(storage, ind, value);
-}
+  static void op(AT_STORAGE_DISPATCH *storage, real value)
+  {
+    ATStorage_(fill)(storage, value);
+  }
+};
 
-AT_TEMPLATE
-real ATTHStorage_get(AT_STORAGE_TYPE *storage, std::size_t ind)
+#ifndef ATTHStorage_set_op
+#define ATTHStorage_set_op
+CASOE(ATTHStorage_set)
+#endif
+template <>
+struct ATTHStorage_set<Backend::Back, ScalarType::Real>
 {
-  return ((ATStorage_(get)(storage, ind)));  
-}
+  static void op(AT_STORAGE_DISPATCH *storage, ptrdiff_t ind, real value)
+  {
+    ATStorage_(set)(storage, ind, value);
+  }
+};
 
-AT_TEMPLATE
-void ATTHStorage_set_flag(AT_STORAGE_TYPE *storage, char flag)
+#ifndef ATTHStorage_get_op
+#define ATTHStorage_get_op
+CASOE(ATTHStorage_get)
+#endif
+template <>
+struct ATTHStorage_get<Backend::Back, ScalarType::Real>
 {
-  ATStorage_(setFlag)(storage, flag);
-}
+  static real op(AT_STORAGE_DISPATCH *storage, ptrdiff_t ind)
+  {
+    return ((ATStorage_(get)(storage, ind)));
+  }
+};
 
-AT_TEMPLATE
-void ATTHStorage_clear_flag(AT_STORAGE_TYPE *storage, char flag)
+#ifndef ATTHStorage_set_flag_op
+#define  ATTHStorage_set_flag_op
+CASOE(ATTHStorage_set_flag)
+#endif
+template <>
+struct ATTHStorage_set_flag<Backend::Back, ScalarType::Real>
 {
-  ATStorage_(clearFlag)(storage, flag);  
-}
+  static void op(AT_STORAGE_DISPATCH *storage, char flag)
+  {
+    ATStorage_(setFlag)(storage, flag);
+  }
+};
+
+
+#ifndef ATTHStorage_clear_flag_op
+#define ATTHStorage_clear_flag_op
+CASOE(ATTHStorage_clear_flag)
+#endif
+template <>
+struct ATTHStorage_clear_flag<Backend::Back, ScalarType::Real>
+{
+  static void op(AT_STORAGE_DISPATCH *storage, char flag)
+  {
+    ATStorage_(clearFlag)(storage, flag);
+  }
+};
 } // namespace at
 
-#endif
+#endif	// TH_GENERIC_FILE

@@ -171,8 +171,7 @@ ELSE()
   ADD_LIBRARY(ATen ${AT_LINK_STYLE} ${all_cpp})
 ENDIF()
 ADD_DEPENDENCIES(ATen aten_files_are_generated)
-
-
+# add_definitions(-dM)
 SET_TARGET_PROPERTIES(ATen PROPERTIES VERSION 1 SOVERSION 1)
 
 if(NOT ${CMAKE_VERSION} VERSION_LESS "3.1")

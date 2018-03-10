@@ -9,3 +9,6 @@
 #else
 # define AT_API
 #endif
+
+// Things are geting tedious really fast.
+#define AT_TEMPLATE template <Backend B, ScalarType S>

@@ -8,6 +8,7 @@
 #include "ATen/CPUByteStorage.h"
 #include "ATen/Scalar.h"
 #include "ATen/Half.h"
+// #include "ATen/StorageTemplate.h"
 
 #if AT_CUDA_ENABLED()
 
