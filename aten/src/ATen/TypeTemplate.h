@@ -103,7 +103,7 @@ AT_TEMPLATE Tensor TypeImpl<B, S>::unsafeTensorFromTH(void * th_pointer,
 						      bool retain) const
 {
   if (retain)
-    ATTHStorage_retain<B, S>::op(typename ATTHStorage<B, S>::type* (th_pointer));
+    ATTHStorage_retain<B, S>::op(static_cast<typename ATTHStorage<B, S>::type*>(th_pointer));
 #warning "FIXME: Use not-cpu Tensor."
   return Tensor(new CPUByteTensor(context,(THByteTensor*)(th_pointer)), false);
 }
@@ -111,9 +111,9 @@ AT_TEMPLATE std::unique_ptr<Storage> TypeImpl<B, S>::unsafeStorageFromTH(void * 
 									 bool retain) const
 {
   if (retain)
-    ATTHStorage_retain<B, S>::op(typename ATTHStorage<B, S>::type* (th_pointer));
+    ATTHStorage_retain<B, S>::op(static_cast<typename ATTHStorage<B, S>::type*>(th_pointer));
   return std::unique_ptr<Storage>(new StorageType<B, S>(context,
-							typename ATTHStorage<B, S>::type* (th_pointer)));
+							static_cast<typename ATTHStorage<B, S>::type*>(th_pointer)));
 }
 AT_TEMPLATE const char* TypeImpl<B, S>::toString() const
 {

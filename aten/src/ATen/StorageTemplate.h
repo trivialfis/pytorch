@@ -96,13 +96,15 @@ public:
   virtual int getDevice() const override;
   virtual const char * toString() const override
   {
-    return std::string(backend2string<B>::value)
-      + std::string(scalar2string<S>::value) + "Storage";
+    return (std::string(backend2string<B>::value)
+	    + std::string(scalar2string<S>::value)
+	    + std::string("Storage")).c_str();
   }
   static const char * typeString()
   {
-    return std::string(backend2string<B>::value)
-      + std::string(scalar2string<S>::value) + "Type";
+    return (std::string(backend2string<B>::value)
+	    + std::string(scalar2string<S>::value)
+	    + std::string("Type")).c_str();
   }
 
 protected:
@@ -112,7 +114,7 @@ protected:
 };
 
 AT_TEMPLATE StorageType<B, S>::StorageType(Context* context)
-  :storage(ATTHStorage_new<B, S>::op(), context){}
+  :storage{ATTHStorage_new<B, S>::op(), context}{}
 AT_TEMPLATE StorageType<B, S>::StorageType(Context* context, AT_STORAGE_TYPE* storage)
   :storage(storage), context(context) {}
 AT_TEMPLATE StorageType<B, S>::StorageType(Context* context, std::size_t storage_size)
@@ -211,12 +213,12 @@ template <>
 struct ATAllocator<Backend::CL>
 {
   THClDeviceAllocator storage_deleter;
-  THClDeviceAllocator wrapper_allocator;
+  THClDeviceAllocator wrapped_allocator;
   ATAllocator() :
     storage_deleter {nullptr,
 		     nullptr,
 		     nullptr},
-    wrapper_allocator {nullptr,
+    wrapped_allocator {nullptr,
 		       nullptr,
 		       nullptr} {}
   ~ATAllocator() {}
@@ -228,7 +230,7 @@ template <Backend B>
 ATAllocator<B>* _global_allocator()
 {
   static ATAllocator<B> allocator;
-  return allocator;
+  return &allocator;
 }
 
 
@@ -240,7 +242,7 @@ AT_TEMPLATE StorageType<B, S>::StorageType(Context* context, std::size_t size,
   auto ctx = new detail::AllocatorRetainable(std::move(allocator));
   storage = ATTHStorage_new_with_allocator
     <B, S>::op(size,
-	       &_global_allocator<B>().wrapped_allocator,
+	       &_global_allocator<B>()->wrapped_allocator,
 	       ctx);
   ctx->release();
   ATTHStorage_clear_flag<B, S>::op(storage, TH_STORAGE_RESIZABLE);
@@ -251,7 +253,7 @@ StorageType<B, S>::StorageType(Context* context,
 			       const std::function<void(void*)> & deleter)
   : storage(ATTHStorage_new_with_data_and_allocator<B, S>::op
 	    (static_cast<uint8_t*>(data), size,
-	     &_global_allocator<B>().storage_deleter,
+	     &_global_allocator<B>()->storage_deleter,
 	     new std::function<void(void*)>(deleter))),
     context(context)
 {
