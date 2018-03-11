@@ -19,42 +19,42 @@ typedef struct THClStorage
 } THClStorage;
 
 
-THCL_API real* THClStorage_(data)(THClState *state, const THClStorage*);
-THCL_API ptrdiff_t THClStorage_(size)(THClState *state, const THClStorage*);
-THCL_API int THClStorage_(elementSize)(THClState *state);
+THCL_API real* THClStorage_(data)(const THClStorage*);
+THCL_API ptrdiff_t THClStorage_(size)(const THClStorage*);
+THCL_API int THClStorage_(elementSize)(void);
 
 /* slow access -- checks everything */
-THCL_API void THClStorage_(set)(THClState *state, THClStorage*, ptrdiff_t, real);
-THCL_API real THClStorage_(get)(THClState *state, const THClStorage*, ptrdiff_t);
+THCL_API void THClStorage_(set)(THClStorage*, ptrdiff_t, real);
+THCL_API real THClStorage_(get)(const THClStorage*, ptrdiff_t);
 
-THCL_API THClStorage* THClStorage_(new)(THClState *state);
-THCL_API THClStorage* THClStorage_(newWithSize)(THClState *state, ptrdiff_t size);
-THCL_API THClStorage* THClStorage_(newWithSize1)(THClState *state, real);
-THCL_API THClStorage* THClStorage_(newWithSize2)(THClState *state, real, real);
-THCL_API THClStorage* THClStorage_(newWithSize3)(THClState *state, real, real, real);
-THCL_API THClStorage* THClStorage_(newWithSize4)(THClState *state, real, real, real, real);
-THCL_API THClStorage* THClStorage_(newWithMapping)(THClState *state, const char *filename, ptrdiff_t size, int shared);
+THCL_API THClStorage* THClStorage_(new)(void);
+THCL_API THClStorage* THClStorage_(newWithSize)(ptrdiff_t size);
+THCL_API THClStorage* THClStorage_(newWithSize1)(real);
+THCL_API THClStorage* THClStorage_(newWithSize2)(real, real);
+THCL_API THClStorage* THClStorage_(newWithSize3)(real, real, real);
+THCL_API THClStorage* THClStorage_(newWithSize4)(real, real, real, real);
+THCL_API THClStorage* THClStorage_(newWithMapping)(const char *filename, ptrdiff_t size, int shared);
 
 /* takes ownership of data */
-THCL_API THClStorage* THClStorage_(newWithData)(THClState *state, real *data, ptrdiff_t size);
+THCL_API THClStorage* THClStorage_(newWithData)(real *data, ptrdiff_t size);
 
-THCL_API THClStorage* THClStorage_(newWithAllocator)(
-  THClState *state, ptrdiff_t size,
-  THClDeviceAllocator* allocator,
-  void *allocatorContext);
-THCL_API THClStorage* THClStorage_(newWithDataAndAllocator)(
-  THClState *state, real* data, ptrdiff_t size,
-  THClDeviceAllocator* allocator,
-  void *allocatorContext);
+THCL_API THClStorage* THClStorage_(newWithAllocator)
+  (ptrdiff_t size,
+   THClDeviceAllocator* allocator,
+   void *allocatorContext);
+THCL_API THClStorage* THClStorage_(newWithDataAndAllocator)
+  (real* data, ptrdiff_t size,
+   THClDeviceAllocator* allocator,
+   void *allocatorContext);
 
-THCL_API void THClStorage_(setFlag)(THClState *state, THClStorage *storage, const char flag);
-THCL_API void THClStorage_(clearFlag)(THClState *state, THClStorage *storage, const char flag);
-THCL_API void THClStorage_(retain)(THClState *state, THClStorage *storage);
+THCL_API void THClStorage_(setFlag)(THClStorage *storage, const char flag);
+THCL_API void THClStorage_(clearFlag)(THClStorage *storage, const char flag);
+THCL_API void THClStorage_(retain)(THClStorage *storage);
 
-THCL_API void THClStorage_(free)(THClState *state, THClStorage *storage);
-THCL_API void THClStorage_(resize)(THClState *state, THClStorage *storage, ptrdiff_t size);
-THCL_API void THClStorage_(fill)(THClState *state, THClStorage *storage, real value);
+THCL_API void THClStorage_(free)(THClStorage *storage);
+THCL_API void THClStorage_(resize)(THClStorage *storage, ptrdiff_t size);
+THCL_API void THClStorage_(fill)(THClStorage *storage, real value);
 
-THCL_API int THClStorage_(getDevice)(THClState* state, const THClStorage* storage);
+THCL_API int THClStorage_(getDevice)(const THClStorage* storage);
 
 #endif

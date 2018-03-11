@@ -1,7 +1,3 @@
-#ifndef TH_GENERIC_FILE
-#define TH_GENERIC_FILE "ATen/StorageOpsGeneric.h"
-#else
-
 #include <ATen/ScalarType.h>
 /*
   Anything use of macro technique for code generation should stop at this layer.
@@ -27,6 +23,7 @@ struct ATTHStorage<Backend::Back, ScalarType::Real>
 #define ATStorage_(NAME)    TH_CONCAT_5(TH, Back_sym, Real, Storage_, NAME)
 #define AT_STORAGE_TYPE typename ATTHStorage<B, S>::type
 #define AT_STORAGE_DISPATCH typename ATTHStorage<Backend::Back, ScalarType::Real>::type
+
 
 #define CASOE(name)					\
   template <Backend B, ScalarType S>			\
@@ -66,7 +63,7 @@ template <>
 struct ATTHStorage_new_with_allocator<Backend::Back, ScalarType::Real>
 {
   static AT_STORAGE_DISPATCH* op(ptrdiff_t size,
-				 THAllocator* allocator,
+				 ATTHAllocator<Backend::Back>::type* allocator,
 				 void *allocatorContext)
   {
     return ATStorage_(newWithAllocator)(size, allocator, allocatorContext);
@@ -80,7 +77,8 @@ CASOE(ATTHStorage_new_with_data_and_allocator)
 template <>
 struct ATTHStorage_new_with_data_and_allocator<Backend::Back, ScalarType::Real>
 {
-  static AT_STORAGE_DISPATCH* op(real* data, ptrdiff_t size, THAllocator* allocator,
+  static AT_STORAGE_DISPATCH* op(real* data, ptrdiff_t size,
+				 ATTHAllocator<Backend::Back>::type* allocator,
 				 void* allocatorContext)
   {
     return ATStorage_(newWithDataAndAllocator)(data, size, allocator,
@@ -193,5 +191,3 @@ struct ATTHStorage_clear_flag<Backend::Back, ScalarType::Real>
   }
 };
 } // namespace at
-
-#endif	// TH_GENERIC_FILE

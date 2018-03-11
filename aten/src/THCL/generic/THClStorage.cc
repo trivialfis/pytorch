@@ -5,79 +5,104 @@
 #include <boost/compute/core.hpp>
 #include <boost/compute/command_queue.hpp>
 
-real* THClStorage_(data)(THClState *state, const THClStorage *self)
+extern THClState* THCl_global_state();
+
+real* THClStorage_(data)(const THClStorage *self)
 {
   return self->data;
 }
 
-ptrdiff_t THClStorage_(size)(THClState *state, const THClStorage *self)
+ptrdiff_t THClStorage_(size)(const THClStorage *self)
 {
   return self->size;
 }
 
-int THClStorage_(elementSize)(THClState *state)
+int THClStorage_(elementSize)()
 {
   return sizeof(real);
 }
 
-void THClStorage_(set)(THClState *state,
-		       THClStorage *self, ptrdiff_t index, real value)
+void THClStorage_(set)(THClStorage *self, ptrdiff_t index, real value)
 {
+  THClState *state = THCl_global_state();
   THArgCheck((index >= 0) && (index < self->size), 2, "index out of bounds");
   auto queue = state->currentQueue;
 }
 
-THCL_API real THClStorage_(get)(THClState *state, const THClStorage*, ptrdiff_t);
+real THClStorage_(get)(const THClStorage*, ptrdiff_t)
+{
+  
+}
 
-THCL_API THClStorage* THClStorage_(new)(THClState *state);
-THCL_API THClStorage* THClStorage_(newWithSize)(THClState *state, ptrdiff_t size);
-THCL_API THClStorage* THClStorage_(newWithSize1)(THClState *state, real);
-THCL_API THClStorage* THClStorage_(newWithSize2)(THClState *state, real, real);
-THCL_API THClStorage* THClStorage_(newWithSize3)(THClState *state, real, real, real);
-THCL_API THClStorage* THClStorage_(newWithSize4)(THClState *state, real, real, real, real);
-THCL_API THClStorage* THClStorage_(newWithMapping)(THClState *state, const char *filename, ptrdiff_t size, int shared);
+THClStorage* THClStorage_(new)(void)
+{
+  
+}
+THClStorage* THClStorage_(newWithSize)(ptrdiff_t size)
+{
+  
+}
+THClStorage* THClStorage_(newWithSize1)(real)
+{
+  
+}
+THClStorage* THClStorage_(newWithSize2)(real, real)
+{
+  
+}
+THClStorage* THClStorage_(newWithSize3)(real, real, real)
+{
+  
+}
+THClStorage* THClStorage_(newWithSize4)(real, real, real, real)
+{
+  
+}
+THClStorage* THClStorage_(newWithMapping)(const char *filename, ptrdiff_t size, int shared)
+{
+  
+}
 
 /* takes ownership of data */
-THClStorage* THClStorage_(newWithData)(THClState *state, real *data, ptrdiff_t size)
+THClStorage* THClStorage_(newWithData)(real *data, ptrdiff_t size)
 {
   
 }
 
-THClStorage* THClStorage_(newWithAllocator)(
-  THClState *state, ptrdiff_t size,
-  THClDeviceAllocator* allocator,
-  void *allocatorContext)
+THClStorage* THClStorage_(newWithAllocator)(ptrdiff_t size,
+					    THClDeviceAllocator* allocator,
+					    void *allocatorContext)
 {
   
 }
-THClStorage* THClStorage_(newWithDataAndAllocator)(
-  THClState *state, real* data, ptrdiff_t size,
-  THClDeviceAllocator* allocator,
-  void *allocatorContext)
+THClStorage* THClStorage_(newWithDataAndAllocator)(real* data, ptrdiff_t size,
+						   THClDeviceAllocator* allocator,
+						   void *allocatorContext)
 {
   
 }
 
-void THClStorage_(setFlag)(THClState *state, THClStorage *storage, const char flag)
+void THClStorage_(setFlag)(THClStorage *storage, const char flag)
 {
   storage->flag |= flag;
 }
-void THClStorage_(clearFlag)(THClState *state, THClStorage *storage, const char flag)
+void THClStorage_(clearFlag)(THClStorage *storage, const char flag)
 {
   storage->flag &= ~flag;
 }
-void THClStorage_(retain)(THClState *state, THClStorage *self)
+void THClStorage_(retain)(THClStorage *self)
 {
   if(self && (self->flag & TH_STORAGE_REFCOUNTED))
     {
       THAtomicIncrementRef(&self->refcount);
     }
 }
-void THClStorage_(free)(THClState *state, THClStorage *self)
+void THClStorage_(free)(THClStorage *self)
 {
   if(!(self->flag & TH_STORAGE_REFCOUNTED))
     return;
-
+  
+  // THClState *state = THCl_global_state();
   if (THAtomicDecrementRef(&self->refcount))
     {
       if (self->flag & TH_STORAGE_FREEMEM)
@@ -86,20 +111,20 @@ void THClStorage_(free)(THClState *state, THClStorage *self)
 	}
       if(self->flag & TH_STORAGE_VIEW)
 	{
-	  THClStorage_(free)(state, self->view);
+	  THClStorage_(free)(self->view);
 	}
       THFree(self);
     }
 }
-void THClStorage_(resize)(THClState *state, THClStorage *storage, ptrdiff_t size)
+void THClStorage_(resize)(THClStorage *storage, ptrdiff_t size)
 {
   
 }
-void THClStorage_(fill)(THClState *state, THClStorage *storage, real value)
+void THClStorage_(fill)(THClStorage *storage, real value)
 {
   
 }
-int THClStorage_(getDevice)(THClState* state, const THClStorage* storage)
+int THClStorage_(getDevice)(const THClStorage* storage)
 {
   
 }

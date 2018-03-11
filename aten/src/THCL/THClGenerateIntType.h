@@ -5,14 +5,14 @@
 #define real int32_t
 #define accreal int64_t
 #define Real Int
-#define CReal CudaInt
+#define ClReal ClInt
 #define THCL_REAL_IS_INT
 #line 1 THCL_GENERIC_FILE
 #include THCL_GENERIC_FILE
 #undef real
 #undef accreal
 #undef Real
-#undef CReal
+#undef ClReal
 #undef THCL_REAL_IS_INT
 
 #ifndef THClGenerateAllTypes

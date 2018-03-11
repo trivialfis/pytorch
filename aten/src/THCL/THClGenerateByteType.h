@@ -5,14 +5,14 @@
 #define real uint8_t
 #define accreal int64_t
 #define Real Byte
-#define CReal CudaByte
+#define ClReal ClByte
 #define THCL_REAL_IS_BYTE
 #line 1 THCL_GENERIC_FILE
 #include THCL_GENERIC_FILE
 #undef real
 #undef accreal
 #undef Real
-#undef CReal
+#undef ClReal
 #undef THCL_REAL_IS_BYTE
 
 #ifndef THClGenerateAllTypes

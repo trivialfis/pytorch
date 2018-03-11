@@ -6,14 +6,11 @@
 #include "ATen/SparseTensorRef.h"
 #include "ATen/ScalarType.h"
 #include "ATen/Scalar.h"
-// #include "ATen/Tensor.h"
 #include "ATen/Allocator.h"
 #include "ATen/Type.h"
 #include "ATen/Storage.h"
 
-#include "ATen/TypeTemplate.h"
 #include "ATen/StorageTemplate.h"
-#include "ATen/StorageOps.h"
 
 #warning "Remove these headers."
 #include "ATen/generated/CPUGenerator.h"
@@ -106,7 +103,7 @@ AT_TEMPLATE Tensor TypeImpl<B, S>::unsafeTensorFromTH(void * th_pointer,
 						      bool retain) const
 {
   if (retain)
-    ATTHStorage_retain<B, S>::op(ATTHStorage<B, S>::type* (th_pointer));
+    ATTHStorage_retain<B, S>::op(typename ATTHStorage<B, S>::type* (th_pointer));
 #warning "FIXME: Use not-cpu Tensor."
   return Tensor(new CPUByteTensor(context,(THByteTensor*)(th_pointer)), false);
 }
@@ -114,9 +111,9 @@ AT_TEMPLATE std::unique_ptr<Storage> TypeImpl<B, S>::unsafeStorageFromTH(void * 
 									 bool retain) const
 {
   if (retain)
-    ATTHStorage_retain<B, S>::op(ATTHStorage<B, S>::type* (th_pointer));
+    ATTHStorage_retain<B, S>::op(typename ATTHStorage<B, S>::type* (th_pointer));
   return std::unique_ptr<Storage>(new StorageType<B, S>(context,
-							ATTHStorage<B, S>::type* (th_pointer)));
+							typename ATTHStorage<B, S>::type* (th_pointer)));
 }
 AT_TEMPLATE const char* TypeImpl<B, S>::toString() const
 {
@@ -124,8 +121,10 @@ AT_TEMPLATE const char* TypeImpl<B, S>::toString() const
 }
 AT_TEMPLATE TypeID TypeImpl<B, S>::ID() const
 {
-  return static_cast<int>(B) +
-    static_cast<int>(S) + static_cast<int>(ScalarType::NumOptions);
+#warning "Return a real id"
+  return TypeID::CPUByte;
+  // return static_cast<int>(B) +
+  //   static_cast<int>(S) + static_cast<int>(ScalarType::NumOptions);
 }
 AT_TEMPLATE std::size_t TypeImpl<B, S>::elementSizeInBytes() const
 {

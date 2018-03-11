@@ -1,7 +1,6 @@
 #ifndef THCL_GENERAL_INC
 #define THCL_GENERAL_INC
 
-#include <boost/compute/core.hpp>
 
 #ifdef __cplusplus
 # define THCL_EXTERNC extern "C"
@@ -10,12 +9,22 @@
 #endif
 
 #define THCL_API THCL_EXTERNC
+
+#include <boost/compute/core.hpp>
 #include <boost/compute/command_queue.hpp>
-#include "TH/TH.h"
+// #include "TH/TH.h"
+#include "TH/THAllocator.h"
+#include "TH/THStorage.h"
+#include "TH/THAtomic.h"
 
 namespace compute = boost::compute;
 
-typedef struct THClDeviceAllocator
+void thcl_wrapped_allocate(void* ptr)
+{
+  
+}
+
+typedef struct _THClDeviceAllocator
 {
   cl_int (*malloc)(void*, void**, size_t, cl_command_queue);
   cl_int (*realloc)(void*, void**, size_t, size_t, cl_command_queue);
@@ -36,7 +45,9 @@ typedef struct THClState
 
 } THClState;
 
-void THCl_init(THClState *state);
+extern THClState* THCl_global_state();
+
+void THCl_init();
 THClState* THClState_alloc();
 void THCl_initializeState(THClState *state);
 

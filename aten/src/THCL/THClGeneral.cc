@@ -7,9 +7,15 @@
 // {
 
 // }
-
-void THCl_init(THClState *state)
+THClState* THCl_global_state()
 {
+  static THClState *state = THClState_alloc();
+  return state;
+}
+
+void THCl_init()
+{
+  THClState *state = THCl_global_state();
   if (!state->clHostAllocator)
     {
       state->clHostAllocator = &THClHostAllocator;

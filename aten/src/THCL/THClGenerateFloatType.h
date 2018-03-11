@@ -7,14 +7,14 @@
    we opt into it? */
 #define accreal float
 #define Real Float
-#define CReal Cuda
+#define ClReal ClFloat
 #define THCL_REAL_IS_FLOAT
 #line 1 THCL_GENERIC_FILE
 #include THCL_GENERIC_FILE
 #undef real
 #undef accreal
 #undef Real
-#undef CReal
+#undef ClReal
 #undef THCL_REAL_IS_FLOAT
 
 #ifndef THClGenerateAllTypes

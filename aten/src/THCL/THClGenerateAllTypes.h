@@ -19,7 +19,7 @@
 #include "THClGenerateShortType.h"
 #include "THClGenerateIntType.h"
 #include "THClGenerateLongType.h"
-// #include "THClGenerateHalfType.h"
+#include "THClGenerateHalfType.h"
 #include "THClGenerateFloatType.h"
 #include "THClGenerateDoubleType.h"
 

@@ -8,7 +8,6 @@
 #include "ATen/UndefinedType.h"
 
 #include <iostream>
-#include "ATen/TypeTemplate.h"
 #include "ATen/CPUByteType.h"
 #include "ATen/CPUCharType.h"
 #include "ATen/CPUDoubleType.h"
@@ -24,6 +23,7 @@
 #include "ATen/SparseCPUIntType.h"
 #include "ATen/SparseCPULongType.h"
 #include "ATen/SparseCPUShortType.h"
+
 #include "ATen/TypeTemplate.h"
 
 namespace at {
@@ -45,14 +45,16 @@ void Type::registerAll(Context * context) {
   context->type_registry[static_cast<int>(Backend::SparseCPU)][static_cast<int>(ScalarType::Long)].reset(new SparseCPULongType(context));
   context->type_registry[static_cast<int>(Backend::SparseCPU)][static_cast<int>(ScalarType::Short)].reset(new SparseCPUShortType(context));
   context->type_registry[static_cast<int>(Backend::Undefined)][static_cast<int>(ScalarType::Undefined)].reset(new UndefinedType(context));
+#if AT_CL_ENABLED()
   context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Byte)].reset(new TypeImpl<Backend::CL, ScalarType::Byte>{context});
   context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Char)].reset(new TypeImpl<Backend::CL, ScalarType::Char>{context});
   context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Double)].reset(new TypeImpl<Backend::CL, ScalarType::Double>{context});
   context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Float)].reset(new TypeImpl<Backend::CL, ScalarType::Float>{context});
   context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Int)].reset(new TypeImpl<Backend::CL, ScalarType::Int>{context});
-context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Long)].reset(new TypeImpl<Backend::CL, ScalarType::Long>{context});
-context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Short)].reset(new TypeImpl<Backend::CL, ScalarType::Short>{context});
- context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Half)].reset(new TypeImpl<Backend::CL, ScalarType::Half>{context});
+  context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Long)].reset(new TypeImpl<Backend::CL, ScalarType::Long>{context});
+  context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Short)].reset(new TypeImpl<Backend::CL, ScalarType::Short>{context});
+  context->type_registry[static_cast<int>(Backend::CL)][static_cast<int>(ScalarType::Half)].reset(new TypeImpl<Backend::CL, ScalarType::Half>{context});
+#endif
 }
 
 Tensor & Type::copy_(Tensor & self, const Tensor & src, bool non_blocking) const {

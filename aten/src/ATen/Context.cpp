@@ -49,8 +49,7 @@ Context::Context()
 void Context::doInitCL()
 {
 #if AT_CL_ENABLED()
-  thcl_state = THClState_alloc();
-  THCl_init(thcl_state);
+  THCl_init();
 #endif
 }
 void Context::doInitCUDA() {

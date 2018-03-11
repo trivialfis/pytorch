@@ -98,6 +98,7 @@ CONFIGURE_FILE(Config.h.in "${CMAKE_CURRENT_SOURCE_DIR}/Config.h")
 
 FILE(GLOB base_h RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.h")
 FILE(GLOB base_cpp RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
+FILE(GLOB base_cc RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cc")
 FILE(GLOB native_cpp RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "native/*.cpp")
 FILE(GLOB native_cudnn_cpp RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "native/cudnn/*.cpp")
 FILE(GLOB native_cuda_cu RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "native/cuda/*.cu")
@@ -136,7 +137,7 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/generated")
 file(READ ${CMAKE_CURRENT_BINARY_DIR}/ATen/generated_cpp.txt generated_cpp)
 
 
-SET(all_cpp ${base_cpp} ${native_cpp} ${native_cudnn_cpp} ${generated_cpp} ${ATen_CPU_SRCS})
+SET(all_cpp ${base_cpp} ${base_cc} ${native_cpp} ${native_cudnn_cpp} ${generated_cpp} ${ATen_CPU_SRCS})
 
 INCLUDE_DIRECTORIES(${ATen_CPU_INCLUDE})
 IF(NOT NO_CUDA)
@@ -171,7 +172,7 @@ ELSE()
   ADD_LIBRARY(ATen ${AT_LINK_STYLE} ${all_cpp})
 ENDIF()
 ADD_DEPENDENCIES(ATen aten_files_are_generated)
-# add_definitions(-dM)
+# add_definitions(-E)
 SET_TARGET_PROPERTIES(ATen PROPERTIES VERSION 1 SOVERSION 1)
 
 if(NOT ${CMAKE_VERSION} VERSION_LESS "3.1")

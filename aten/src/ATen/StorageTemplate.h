@@ -1,8 +1,9 @@
 #pragma once
 
 #include <TH/TH.h>
-#include <THNN/THNN.h>
-#undef THNN_
+// #include <THNN/THNN.h>
+// #undef THNN_
+// #include "THCL/THCl.h"
 #include <THS/THS.h>
 
 #include "ATen/StorageOps.h"
@@ -118,7 +119,7 @@ AT_TEMPLATE StorageType<B, S>::StorageType(Context* context, std::size_t storage
   :storage(storage), context(context) {}
 
 template <Backend b>
-struct ATTHAllocator;
+struct ATAllocator;
 
 template <>
 void call_deleter<Backend::CPU>(void * ctx, void * data)
@@ -143,18 +144,18 @@ void wrapped_free<Backend::CPU>(void * ctx, void * data)
 }
 
 template <>
-struct ATTHAllocator<Backend::CPU>
+struct ATAllocator<Backend::CPU>
 {
   THAllocator storage_deleter;
   THAllocator wrapped_allocator;
-  ATTHAllocator() :
+  ATAllocator() :
     storage_deleter {nullptr,
 		     nullptr,
 		     &call_deleter<Backend::CPU>,},
     wrapped_allocator {&wrapped_alloc<Backend::CPU>,
 		       nullptr,
 		       &wrapped_free<Backend::CPU>,} {}
-  ~ATTHAllocator() {}
+  ~ATAllocator() {}
 };
 
 # if AT_CUDA_ENABLED()
@@ -168,9 +169,9 @@ cudaError_t call_deleter<Backend::CUDA>(void * ctx, void * data)
 }
 template <>
 cudaError_t wrapped_alloc<Backend::CUDA>(void * ctx,
-						void** result,
-						size_t size,
-						cudaStream_t stream)
+					 void** result,
+					 size_t size,
+					 cudaStream_t stream)
 {
   auto ac = static_cast<detail::AllocatorRetainable*>(ctx);
   ac->retain();
@@ -186,11 +187,11 @@ cudaError_t wrapped_free<Backend::CUDA>(void * ctx, void * data)
   return cudaSuccess;
 }
 template <>
-struct ATTHAllocator<Backend::CUDA>
+struct ATAllocator<Backend::CUDA>
 {
   THCDeviceAllocator storage_deleter ;
   THCDeviceAllocator wrapped_allocator;
-  ATTHAllocator() :
+  ATAllocator() :
     storage_deleter {nullptr,
 		     nullptr,
 		     call_deleter<Backend::CUDA>,
@@ -201,16 +202,36 @@ struct ATTHAllocator<Backend::CUDA>
 		       wrapped_free<Backend::CUDA>,
 		       nullptr,
 		       nullptr}{}
-   ~ATTHAllocator() {}
-}
+   ~ATAllocator() {}
+};
 
 #endif
-template <Backend B>
-ATTHAllocator<B>* _global_allocator()
+#if AT_CL_ENABLED()
+template <>
+struct ATAllocator<Backend::CL>
 {
-  static ATTHAllocator<B> allocator;
+  THClDeviceAllocator storage_deleter;
+  THClDeviceAllocator wrapper_allocator;
+  ATAllocator() :
+    storage_deleter {nullptr,
+		     nullptr,
+		     nullptr},
+    wrapper_allocator {nullptr,
+		       nullptr,
+		       nullptr} {}
+  ~ATAllocator() {}
+// #error "Not implemented."
+};
+#endif
+
+template <Backend B>
+ATAllocator<B>* _global_allocator()
+{
+  static ATAllocator<B> allocator;
   return allocator;
 }
+
+
 AT_TEMPLATE StorageType<B, S>::StorageType(Context* context, std::size_t size,
 					   std::unique_ptr<Allocator> allocator)
   : storage(nullptr),
@@ -327,6 +348,6 @@ AT_TEMPLATE Type& StorageType<B, S>::type() const
 #define AT_CPU_TEMP_STORAGE_TYPE(_1, name, _2)				\
   using CPU ## name ## Storage = StorageType<Backend::CPU, ScalarType::name>;
 
-AT_FORALL_SCALAR_TYPES(AT_CPU_TEMP_STORAGE_TYPE)
+// AT_FORALL_SCALAR_TYPES(AT_CPU_TEMP_STORAGE_TYPE)
 
 } // namespace at

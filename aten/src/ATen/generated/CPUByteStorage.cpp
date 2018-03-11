@@ -2,9 +2,10 @@
 #include "ATen/Half.h"
 #include "ATen/Allocator.h"
 
-#include "ATen/StorageOps.h"
+#include "ATen/StorageTemplate.h"
 
 #include "ATen/Config.h"
+
 #if AT_CUDA_ENABLED()
 
 #endif
