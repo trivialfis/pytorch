@@ -48,6 +48,7 @@ template<typename To, typename From> To checked_convert(From f, const char* name
 struct alignas(2) Half {
   unsigned short x;
   operator double();
+  // operator cl_half();
 };
 
 template<> AT_API Half convert(float f);
@@ -60,6 +61,10 @@ template<> AT_API int64_t convert(Half f);
 inline Half::operator double() {
   return convert<double, Half>(*this);
 }
+// inline Half::operator cl_half()
+// {
+//   return convert<cl_half, Half>(*this);
+// }
 
 template<> bool overflows<Half, double>(double f);
 template<> bool overflows<Half, int64_t>(int64_t f);

@@ -114,7 +114,7 @@ protected:
 };
 
 AT_TEMPLATE StorageType<B, S>::StorageType(Context* context)
-  :storage{ATTHStorage_new<B, S>::op(), context}{}
+  :storage{ATTHStorage_new<B, S>::op()}, context(context){}
 AT_TEMPLATE StorageType<B, S>::StorageType(Context* context, AT_STORAGE_TYPE* storage)
   :storage(storage), context(context) {}
 AT_TEMPLATE StorageType<B, S>::StorageType(Context* context, std::size_t storage_size)
@@ -252,7 +252,7 @@ StorageType<B, S>::StorageType(Context* context,
 			       void * data, std::size_t size,
 			       const std::function<void(void*)> & deleter)
   : storage(ATTHStorage_new_with_data_and_allocator<B, S>::op
-	    (static_cast<uint8_t*>(data), size,
+	    (static_cast<typename scalar2type<S>::type*>(data), size,
 	     &_global_allocator<B>()->storage_deleter,
 	     new std::function<void(void*)>(deleter))),
     context(context)
@@ -318,13 +318,13 @@ AT_TEMPLATE auto StorageType<B, S>::fast_set(std::size_t ind,
 AT_TEMPLATE auto StorageType<B, S>::get(std::size_t ind) -> Scalar
 {
   // static cast to fix  long -> int64_t issues
-  return static_cast<typename scalar2type<S>::type*>((ATTHStorage_get<B, S>::op(storage, ind)));
+  return static_cast<typename scalar2type<S>::type>((ATTHStorage_get<B, S>::op(storage, ind)));
 }
 AT_TEMPLATE auto StorageType<B, S>::fast_get(std::size_t ind) -> Scalar
 {
   if(B == Backend::CPU)
     throw std::runtime_error("unsupported operation 'fast_get'");
-  return static_cast<uint8_t>((storage->data[ind]));
+  return static_cast<typename scalar2type<S>::type>((storage->data[ind]));
 }
 AT_TEMPLATE void StorageType<B, S>::set_flag(char flag)
 {
